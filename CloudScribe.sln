@@ -1,12 +1,12 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudScribe.Notes.API", "Src\Services\CloudScribe.Notes.API\CloudScribe.Notes.API.csproj", "{5866E099-7D7C-4E8D-A3B0-86C5924613FC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudScribe.Notes.API", "src\services\CloudScribe.Notes.API\CloudScribe.Notes.API.csproj", "{5866E099-7D7C-4E8D-A3B0-86C5924613FC}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Services", "Services", "{7C40B534-CF90-47B1-A815-2FBD0A15CD87}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Web", "Web", "{1E77980A-C202-409A-941E-AF4D855DF1FF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudScribe.Blazor", "Src\Web\CloudScribe.Blazor\CloudScribe.Blazor.csproj", "{978EB09B-0AAB-45BD-B427-E6060B5D3D33}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudScribe.Blazor", "src\web\CloudScribe.Blazor\CloudScribe.Blazor.csproj", "{978EB09B-0AAB-45BD-B427-E6060B5D3D33}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
