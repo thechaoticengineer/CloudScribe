@@ -1,0 +1,6 @@
+@CloudScribe.Notes.API_HostAddress = http://localhost:5211
+
+GET {{CloudScribe.Notes.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
