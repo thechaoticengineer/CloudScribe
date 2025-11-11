@@ -107,20 +107,19 @@ kubectl apply -f k8s/
 
 ```
 CloudScribe/
-    Src/
-        Services/
-            CloudScribe.Notes.API/      # Notes API service
-        Web/
-            CloudScribe.Blazor/         # Blazor frontend
-        Shared/                         # Shared libraries (planned)
-            CloudScribe.Shared.Contracts/
-            CloudScribe.Shared.Auth/
-    infrastructure/
-        terraform/                      # Terraform configurations
-        bicep/                          # Azure Bicep templates
-        k8s/                            # Kubernetes manifests
-        docker-compose.yml              # Local development
-    tests/                              # Test projects
+├── CloudScribe.sln
+├── docker-compose.yml
+├── infrastructure
+│         ├── bicep
+│         ├── k8s
+│         └── terraform
+├── README.md
+├── src
+│         ├── services
+│         │   └── CloudScribe.Notes.API
+│         └── web
+│             └── CloudScribe.Blazor
+└── tests
 ```
 
 ## Roadmap
