@@ -15,6 +15,8 @@ public sealed class Note
         Id = Guid.CreateVersion7();
         Title = title;
         Content = content;
+        CreatedUtc = DateTime.UtcNow;
+        ModifiedUtc = DateTime.UtcNow;
     }
     
     public static Note Create(string title, string content)

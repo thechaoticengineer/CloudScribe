@@ -17,7 +17,6 @@ public class NoteConfiguration : IEntityTypeConfiguration<Note>
         builder.Property(x => x.Content)
             .HasColumnType("text")
             .IsRequired();
-        builder.Property(x => x.CreatedUtc)
-            .HasDefaultValueSql("GETUTCDATE()");
+        builder.Property(x => x.CreatedUtc);
     }
 }
