@@ -1,6 +1,6 @@
 namespace CloudScribe.Notes.API.Domain;
 
-public sealed class Notes
+public sealed class Note
 {
     public Guid Id { get; }
     public string Title { get; private set; } = string.Empty;
@@ -8,23 +8,21 @@ public sealed class Notes
     public DateTime CreatedUtc { get; }
     public DateTime ModifiedUtc { get; private set; }
     
-    private Notes() { }
+    private Note() { }
 
-    private Notes(string title, string content)
+    private Note(string title, string content)
     {
         Id = Guid.CreateVersion7();
         Title = title;
         Content = content;
-        CreatedUtc = DateTime.UtcNow;
-        ModifiedUtc = DateTime.UtcNow;
     }
     
-    public static Notes Create(string title, string content)
+    public static Note Create(string title, string content)
     {
-        return new Notes(title, content);
+        return new Note(title, content);
     }
 
-    public Notes Update(string title, string content)
+    public Note Update(string title, string content)
     {
         Title = title;
         Content = content;
