@@ -1,3 +1,5 @@
+using CloudScribe.Notes.API.Api.Endpoints;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -12,5 +14,6 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
+app.MapNotesEndpoints();
 app.UseHttpsRedirection();
 app.Run();
