@@ -1,5 +1,6 @@
 using CloudScribe.Notes.API.Api.Endpoints;
 using CloudScribe.Notes.API.Infrastructure.Data;
+using CloudScribe.Notes.API.Services;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -10,6 +11,8 @@ builder.Services.AddOpenApi();
 
 builder.Services.AddDbContext<CloudScribeDbContext>(options =>
     options.UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddScoped<NotesService>();
 
 var app = builder.Build();
 
