@@ -1,3 +1,5 @@
+using JetBrains.Annotations;
+
 namespace CloudScribe.Notes.API.Domain;
 
 public sealed class Note
@@ -7,7 +9,9 @@ public sealed class Note
     public string Content { get; private set; } = string.Empty;
     public DateTime CreatedUtc { get; }
     public DateTime ModifiedUtc { get; private set; }
+    // UserID will be added later
     
+    [UsedImplicitly]
     private Note() { }
 
     private Note(string title, string content)
