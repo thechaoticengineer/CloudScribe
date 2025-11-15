@@ -3,7 +3,6 @@ using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
 using CloudScribe.SharedKernel;
-using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace CloudScribe.Notes.API.Api.Endpoints;
 

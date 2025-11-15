@@ -1,4 +1,5 @@
 using CloudScribe.Notes.API.Api.Endpoints;
+using CloudScribe.Notes.API.ExceptionHandling;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using CloudScribe.Notes.API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,12 @@ builder.Services.AddDbContext<CloudScribeDbContext>(options =>
 
 builder.Services.AddScoped<NotesService>();
 
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
 var app = builder.Build();
+
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
