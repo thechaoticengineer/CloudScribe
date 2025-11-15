@@ -19,7 +19,7 @@ public static class NotesEndpoints
             .Produces<PagedResult<Note>>()
             .WithDescription("Get all notes ordered by created date descending");
 
-        group.MapGet("{id:guid}", async Task<Results<Ok<Domain.Note>, NotFound>> (Guid id, NotesService service) =>
+        group.MapGet("{id:guid}", async Task<Results<Ok<Note>, NotFound>> (Guid id, NotesService service) =>
         {
             var note = await service.GetByIdAsync(id);
             return note is not null
@@ -37,7 +37,7 @@ public static class NotesEndpoints
         .Produces<Note>(StatusCodes.Status201Created) 
         .WithDescription("Create a new note");
 
-        group.MapPut("{id:guid}", async Task<Results<Ok<Domain.Note>, NotFound>> (Guid id, UpdateNoteRequest request, NotesService service) =>
+        group.MapPut("{id:guid}", async Task<Results<Ok<Note>, NotFound>> (Guid id, UpdateNoteRequest request, NotesService service) =>
         {
             var note = await service.Update(id, request.Title, request.Content);
             return note is not null
