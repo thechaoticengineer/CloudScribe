@@ -1,7 +1,7 @@
 using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
-using SharedKernel;
+using CloudScribe.SharedKernel;
 
 namespace CloudScribe.Notes.API.Services;
 

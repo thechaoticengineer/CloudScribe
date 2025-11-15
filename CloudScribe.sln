@@ -12,7 +12,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudScribe.Notes.API.Tests
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{B9CDBE29-EF09-4CA9-B09D-375E33229E4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SharedKernel", "src\shared\SharedKernel\SharedKernel.csproj", "{6497E00F-C348-4D9E-816A-58D9F1C4A590}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudScribe.SharedKernel", "src\shared\CloudScribe.SharedKernel\CloudScribe.SharedKernel.csproj", "{6497E00F-C348-4D9E-816A-58D9F1C4A590}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CloudScribe.Contracts", "src\shared\CloudScribe.Contracts\CloudScribe.Contracts.csproj", "{B0A4E443-2F99-41D5-853A-311FAD929510}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -36,10 +38,15 @@ Global
 		{6497E00F-C348-4D9E-816A-58D9F1C4A590}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6497E00F-C348-4D9E-816A-58D9F1C4A590}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6497E00F-C348-4D9E-816A-58D9F1C4A590}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B0A4E443-2F99-41D5-853A-311FAD929510}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B0A4E443-2F99-41D5-853A-311FAD929510}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B0A4E443-2F99-41D5-853A-311FAD929510}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B0A4E443-2F99-41D5-853A-311FAD929510}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{5866E099-7D7C-4E8D-A3B0-86C5924613FC} = {7C40B534-CF90-47B1-A815-2FBD0A15CD87}
 		{978EB09B-0AAB-45BD-B427-E6060B5D3D33} = {1E77980A-C202-409A-941E-AF4D855DF1FF}
 		{6497E00F-C348-4D9E-816A-58D9F1C4A590} = {B9CDBE29-EF09-4CA9-B09D-375E33229E4A}
+		{B0A4E443-2F99-41D5-853A-311FAD929510} = {B9CDBE29-EF09-4CA9-B09D-375E33229E4A}
 	EndGlobalSection
 EndGlobal

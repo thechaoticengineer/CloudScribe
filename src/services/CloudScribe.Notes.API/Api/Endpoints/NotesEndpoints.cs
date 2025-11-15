@@ -1,7 +1,8 @@
+using CloudScribe.Contracts.Notes;
 using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
-using SharedKernel;
+using CloudScribe.SharedKernel;
 
 namespace CloudScribe.Notes.API.Api.Endpoints;
 
@@ -54,6 +55,3 @@ public static class NotesEndpoints
         return app;
     }
 }
-
-public record CreateNoteRequest(string Title, string Content);
-public record UpdateNoteRequest(string Title, string Content);

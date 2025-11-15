@@ -1,4 +1,4 @@
-namespace SharedKernel;
+namespace CloudScribe.SharedKernel;
 
 public class PagedResult<T>
 {
