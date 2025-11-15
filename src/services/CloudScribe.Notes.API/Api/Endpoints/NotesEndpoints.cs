@@ -1,6 +1,7 @@
 using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Services;
 using Microsoft.AspNetCore.Http.HttpResults;
+using SharedKernel;
 
 namespace CloudScribe.Notes.API.Api.Endpoints;
 
@@ -12,9 +13,9 @@ public static class NotesEndpoints
             .WithTags("Notes")
             .WithOpenApi();
 
-        group.MapGet("", async (NotesService service) =>
-            Results.Ok(await service.GetAll()))
-            .Produces<IEnumerable<Note>>();
+        group.MapGet("", async (NotesService service, int pageNumber = 1, int pageSize = 10) =>
+            Results.Ok(await service.GetAll(pageNumber, pageSize)))
+            .Produces<PagedResult<Note>>();
 
         group.MapGet("{id:guid}", async Task<Results<Ok<Domain.Note>, NotFound>> (Guid id, NotesService service) =>
         {

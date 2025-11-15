@@ -1,6 +1,7 @@
 using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
+using SharedKernel;
 
 namespace CloudScribe.Notes.API.Services;
 
@@ -13,9 +14,23 @@ public class NotesService
         _db = db;
     }
 
-    public async Task<IEnumerable<Note>> GetAll()
+    public async Task<PagedResult<Note>> GetAll(int pageNumber = 1, int pageSize = 10)
     {
-        return await _db.Notes.ToListAsync();
+        var totalCount = await _db.Notes.CountAsync();
+
+        var items = await _db.Notes
+            .OrderByDescending(n => n.CreatedUtc)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return new PagedResult<Note>
+        {
+            Items = items,
+            PageNumber = pageNumber,
+            PageSize = pageSize,
+            TotalCount = totalCount
+        };
     }
 
     public async Task<Note?> GetByIdAsync(Guid id)
