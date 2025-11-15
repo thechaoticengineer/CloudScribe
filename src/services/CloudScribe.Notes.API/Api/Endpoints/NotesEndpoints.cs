@@ -16,7 +16,8 @@ public static class NotesEndpoints
 
         group.MapGet("", async (NotesService service, int pageNumber = 1, int pageSize = 10) =>
             Results.Ok(await service.GetAll(pageNumber, pageSize)))
-            .Produces<PagedResult<Note>>();
+            .Produces<PagedResult<Note>>()
+            .WithDescription("Get all notes ordered by created date descending");
 
         group.MapGet("{id:guid}", async Task<Results<Ok<Domain.Note>, NotFound>> (Guid id, NotesService service) =>
         {
@@ -25,14 +26,16 @@ public static class NotesEndpoints
                 ? TypedResults.Ok(note)
                 : TypedResults.NotFound();
         })
-        .Produces<Note>();
+        .Produces<Note>()
+        .WithDescription("Get a note by id");
 
         group.MapPost("", async (CreateNoteRequest request, NotesService service) =>
         {
             var note = await service.Create(request.Title, request.Content);
             return Results.Created($"/api/notes/{note.Id}", note);
         })
-        .Produces<Note>(StatusCodes.Status201Created) ;
+        .Produces<Note>(StatusCodes.Status201Created) 
+        .WithDescription("Create a new note");
 
         group.MapPut("{id:guid}", async Task<Results<Ok<Domain.Note>, NotFound>> (Guid id, UpdateNoteRequest request, NotesService service) =>
         {
@@ -41,7 +44,9 @@ public static class NotesEndpoints
                 ? TypedResults.Ok(note)
                 : TypedResults.NotFound();
         }).Produces<Note>()
-        .Produces(StatusCodes.Status404NotFound);
+        .Produces<Note>()
+        .Produces(StatusCodes.Status404NotFound)
+        .WithDescription("Update an existing note");
 
         group.MapDelete("{id:guid}", async Task<Results<NoContent, NotFound>> (Guid id, NotesService service) =>
         {
@@ -50,7 +55,8 @@ public static class NotesEndpoints
                 ? TypedResults.NoContent()
                 : TypedResults.NotFound();
         }).Produces(StatusCodes.Status204NoContent)
-        .Produces(StatusCodes.Status404NotFound);
+        .Produces(StatusCodes.Status404NotFound)
+        .WithDescription("Delete an existing note");
 
         return app;
     }
