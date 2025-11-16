@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CloudScribe.Notes.API.Migrations
 {
     [DbContext(typeof(CloudScribeDbContext))]
-    [Migration("20251115185616_Initial")]
+    [Migration("20251116181508_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -33,7 +33,8 @@ namespace CloudScribe.Notes.API.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
 
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("timestamp with time zone");

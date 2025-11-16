@@ -17,7 +17,7 @@ namespace CloudScribe.Notes.API.Migrations
                 {
                     Id = table.Column<Guid>(type: "uuid", nullable: false),
                     Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Content = table.Column<string>(type: "text", nullable: false),
+                    Content = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: false),
                     CreatedUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     ModifiedUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },

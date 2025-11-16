@@ -30,7 +30,8 @@ namespace CloudScribe.Notes.API.Migrations
 
                     b.Property<string>("Content")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(5000)
+                        .HasColumnType("character varying(5000)");
 
                     b.Property<DateTime>("CreatedUtc")
                         .HasColumnType("timestamp with time zone");

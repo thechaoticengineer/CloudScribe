@@ -15,7 +15,7 @@ public class NoteConfiguration : IEntityTypeConfiguration<Note>
             .HasMaxLength(200)
             .IsRequired();
         builder.Property(x => x.Content)
-            .HasColumnType("text")
+            .HasMaxLength(5000)
             .IsRequired();
         builder.Property(x => x.CreatedUtc);
     }
