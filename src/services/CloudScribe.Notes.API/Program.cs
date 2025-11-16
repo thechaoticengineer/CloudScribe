@@ -3,6 +3,7 @@ using CloudScribe.Notes.API.ExceptionHandling;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using CloudScribe.Notes.API.Services;
 using Microsoft.EntityFrameworkCore;
+using FluentValidation;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,8 @@ builder.Services.AddScoped<NotesService>();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
+
+builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
 var app = builder.Build();
 

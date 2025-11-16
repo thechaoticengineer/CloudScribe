@@ -1,6 +1,7 @@
 using CloudScribe.Contracts.Notes;
 using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Services;
+using CloudScribe.Notes.API.Validators;
 using Microsoft.AspNetCore.Http.HttpResults;
 using CloudScribe.SharedKernel;
 
@@ -32,17 +33,21 @@ public static class NotesEndpoints
 
         group.MapPost("", async (CreateNoteRequest request, NotesService service) =>
             {
-                //Todo: add validation
                 var note = await service.Create(request.Title, request.Content);
                 return Results.Created($"/api/notes/{note.Id}", note);
             })
             .Produces<Note>(StatusCodes.Status201Created)
+            .Produces(StatusCodes.Status400BadRequest)
+            .AddEndpointFilter<ValidationFilter<CreateNoteRequest>>()
             .WithDescription("Create a new note");
 
         group.MapPut("{id:guid}",
-                async Task<Results<Ok<Note>, NotFound>> (Guid id, UpdateNoteRequest request, NotesService service) =>
+                async Task<Results<Ok<Note>, NotFound, BadRequest>> (Guid id, UpdateNoteRequest request, NotesService service, UpdateNoteValidator validator) =>
                 {
-                    //Todo: add validation
+                    if (!(await validator.ValidateAsync(request)).IsValid)
+                    {
+                        return TypedResults.BadRequest();
+                    }
                     var note = await service.Update(id, request.Title, request.Content);
                     return note is not null
                         ? TypedResults.Ok(note)
@@ -50,6 +55,8 @@ public static class NotesEndpoints
                 })
             .Produces<Note>()
             .Produces(StatusCodes.Status404NotFound)
+            .Produces(StatusCodes.Status400BadRequest)
+            .AddEndpointFilter<ValidationFilter<UpdateNoteRequest>>()
             .WithDescription("Update an existing note");
 
         group.MapDelete("{id:guid}", async Task<Results<NoContent, NotFound>> (Guid id, NotesService service) =>
