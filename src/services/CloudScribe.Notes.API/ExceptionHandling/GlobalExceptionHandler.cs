@@ -1,3 +1,4 @@
+using CloudScribe.Notes.API.Domain;
 using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,6 +16,13 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
             Title = "Internal Server Error",
             Detail = "An unexpected error occurred on the server."
         };
+
+        if (exception is DomainException domainException)
+        {
+            problemDetails.Status = StatusCodes.Status400BadRequest;
+            problemDetails.Title = "Bad Request";
+            problemDetails.Detail = domainException.Message;
+        }
         
         httpContext.Response.StatusCode = problemDetails.Status.Value;
         await httpContext.Response.WriteAsJsonAsync(problemDetails, cancellationToken);
