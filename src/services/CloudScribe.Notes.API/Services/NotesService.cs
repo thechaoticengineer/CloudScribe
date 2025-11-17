@@ -5,7 +5,7 @@ using CloudScribe.SharedKernel;
 
 namespace CloudScribe.Notes.API.Services;
 
-public class NotesService
+internal class NotesService
 {
     private readonly CloudScribeDbContext _db;
 

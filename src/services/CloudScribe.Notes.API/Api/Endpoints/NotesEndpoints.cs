@@ -42,12 +42,8 @@ public static class NotesEndpoints
             .WithDescription("Create a new note");
 
         group.MapPut("{id:guid}",
-                async Task<Results<Ok<Note>, NotFound, BadRequest>> (Guid id, UpdateNoteRequest request, NotesService service, UpdateNoteValidator validator) =>
+                async Task<Results<Ok<Note>, NotFound, BadRequest>> (Guid id, UpdateNoteRequest request, NotesService service) =>
                 {
-                    if (!(await validator.ValidateAsync(request)).IsValid)
-                    {
-                        return TypedResults.BadRequest();
-                    }
                     var note = await service.Update(id, request.Title, request.Content);
                     return note is not null
                         ? TypedResults.Ok(note)
