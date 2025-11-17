@@ -4,6 +4,8 @@ namespace CloudScribe.Notes.API.Domain;
 
 public sealed class Note
 {
+    public const int MaxTitleLength = 200;
+    public const int MaxContentLength = 5000;
     public Guid Id { get; }
     public string Title { get; private set; } = string.Empty;
     public string Content { get; private set; } = string.Empty;
@@ -42,7 +44,7 @@ public sealed class Note
     
     private static void ValidateTitle(string title)
     {
-        if (string.IsNullOrWhiteSpace(title) || title.Length > 200)
+        if (string.IsNullOrWhiteSpace(title) || title.Length > MaxTitleLength)
         {
             throw new DomainException("Title must be provided and cannot be longer than 200 characters");
         }
@@ -50,7 +52,7 @@ public sealed class Note
 
     private static void ValidateContent(string content)
     {
-        if (string.IsNullOrWhiteSpace(content) || content.Length > 5000)
+        if (string.IsNullOrWhiteSpace(content) || content.Length > MaxContentLength)
         {
             throw new DomainException("Content must be provided and cannot be longer than 5000 characters");
         }
