@@ -16,7 +16,7 @@ public class ValidationFilter<T> : IEndpointFilter where T : class?
         EndpointFilterInvocationContext context,
         EndpointFilterDelegate next)
     {
-        var argToValidate = context.GetArgument<T>(0);
+        var argToValidate = context.Arguments.OfType<T>().FirstOrDefault();
 
         if (argToValidate is null)
         {
