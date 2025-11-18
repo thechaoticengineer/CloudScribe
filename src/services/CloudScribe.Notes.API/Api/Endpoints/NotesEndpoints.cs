@@ -22,7 +22,7 @@ public static class NotesEndpoints
 
         group.MapGet("{id:guid}", async Task<Results<Ok<Note>, NotFound>> (Guid id, NotesService service) =>
             {
-                var note = await service.GetByIdAsync(id);
+                var note = await service.GetById(id);
                 return note is not null
                     ? TypedResults.Ok(note)
                     : TypedResults.NotFound();

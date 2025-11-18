@@ -11,6 +11,8 @@ public class NoteServiceTest
 {
     private CloudScribeDbContext _dbContext = null!;
     private NotesService _service = null!;
+    private Guid _noteReadId;
+    private Guid _noteDeleteId;
     
     [SetUp]
     public void Setup()
@@ -20,6 +22,12 @@ public class NoteServiceTest
             .Options;
 
         _dbContext = new CloudScribeDbContext(options);
+        var note = Note.Create("test", "test");
+        _noteReadId = note.Id;
+        _dbContext.Notes.Add(note);
+        var noteToDelete = Note.Create("test delete", "test delete");
+        _noteDeleteId = noteToDelete.Id;
+        _dbContext.SaveChanges();
         _service = new NotesService(_dbContext);
     }
     
@@ -45,7 +53,10 @@ public class NoteServiceTest
     [Test]
     public async Task AddNote_ShouldCreateWhenMaxContentLengthIsReached()
     {
-        var result = await _service.Create("test", "a".PadRight(Note.MaxContentLength, 'a'));
+        var createdNote = await _service.Create("test", "a".PadRight(Note.MaxContentLength, 'a'));
+        createdNote.ShouldSatisfyAllConditions(
+            () => createdNote.ShouldNotBeNull(),
+            () => createdNote.Content.Length.ShouldBe(Note.MaxContentLength));
     }
     
     [TestCase(null)]
@@ -71,11 +82,50 @@ public class NoteServiceTest
     [TestCase(" ")]
     public void AddNote_ShouldReturnErrorWhenContentIsEmpty(string? content) =>
         Should.Throw<DomainException>(async () => await _service.Create("test", content!));
+
+    public async Task DeleteNote_ShouldDeleteNoteAndReturnTrue()
+    {
+        var result = await _service.Delete(_noteDeleteId);
+        
+        result.ShouldSatisfyAllConditions(
+            () => result.ShouldBeTrue(),
+            () => _dbContext.Notes.Find(_noteDeleteId).ShouldBeNull());
+    }
     
+    [Test]
+    public async Task DeleteNote_ShouldReturnFalseWhenNoteNotFound()
+    {
+        var result = await _service.Delete(Guid.NewGuid());
+        
+        result.ShouldBeFalse();
+    }
+
+    [Test]
+    public async Task GetNoteById_ShouldReturnNoteWhenFound()
+    {
+        var note = await _service.GetById(_noteReadId);
+
+        note.ShouldNotBeNull();
+        note!.Id.ShouldBe(_noteReadId);
+    }
     
+    [Test]
+    public async Task GetNoteById_ShouldReturnNullWhenNotFound()
+    {
+        var note = await _service.GetById(Guid.NewGuid());
+        
+        note.ShouldBeNull();
+    }
+
+    [Test]
+    public async Task GetAllNotes_ShouldReturnAllNotes()
+    {
+        var notes = await _service.GetAll();
+        notes.ShouldNotBeNull();
+        notes.Items.Count().ShouldBeGreaterThan(0);
+    }
     
-    
-    
+    [TestCase]
     [TearDown]
     public async Task TearDown()
     {

@@ -33,7 +33,7 @@ internal class NotesService
         };
     }
 
-    public async Task<Note?> GetByIdAsync(Guid id)
+    public async Task<Note?> GetById(Guid id)
     {
         return await _db.Notes.FindAsync(id);
     }
