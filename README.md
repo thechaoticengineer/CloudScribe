@@ -124,10 +124,10 @@ CloudScribe/
 
 ## Roadmap
 
-- [ ] Core API implementation (Notes CRUD)
+- [x] Core API implementation (Notes CRUD)
 - [ ] Blazor UI for note management
 - [ ] Keycloak integration (OAuth2/OIDC)
-- [ ] Entity Framework Core with PostgreSQL
+- [x] Entity Framework Core with PostgreSQL
 - [ ] Docker containerization
 - [ ] Kubernetes manifests
 - [ ] Terraform infrastructure provisioning
