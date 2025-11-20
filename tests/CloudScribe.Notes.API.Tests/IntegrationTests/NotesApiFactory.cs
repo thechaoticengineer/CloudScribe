@@ -19,7 +19,10 @@ public class NotesApiFactory : WebApplicationFactory<AssemblyMarker>
         .WithPassword("postgres")
         .Build();
 
-    public PostgreSqlContainer DbContainer => _dbContainer;
+    public async Task StartContainerAsync()
+    {
+        await _dbContainer.StartAsync();
+    }
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -36,5 +39,12 @@ public class NotesApiFactory : WebApplicationFactory<AssemblyMarker>
             var dbContext = scope.ServiceProvider.GetRequiredService<CloudScribeDbContext>();
             dbContext.Database.Migrate();
         });
+    }
+
+    public override async ValueTask DisposeAsync()
+    {
+        await _dbContainer.StopAsync();
+        await _dbContainer.DisposeAsync();
+        await base.DisposeAsync();
     }
 }
