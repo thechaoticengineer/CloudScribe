@@ -7,9 +7,11 @@ using Shouldly;
 namespace CloudScribe.Notes.API.Tests.UnitTests;
 
 [TestFixture]
+[FixtureLifeCycle(LifeCycle.InstancePerTestCase)]
+[Parallelizable(ParallelScope.Children)]
 public class NoteServiceTest
 {
-    private CloudScribeDbContext _dbContext = null!;
+    private CloudScribeDbContext _dbContext;
     private NotesService _service = null!;
     private Guid _noteReadId;
     private Guid _noteDeleteId;
@@ -27,6 +29,7 @@ public class NoteServiceTest
         _dbContext.Notes.Add(note);
         var noteToDelete = Note.Create("test delete", "test delete");
         _noteDeleteId = noteToDelete.Id;
+        _dbContext.Notes.Add(noteToDelete);
         _dbContext.SaveChanges();
         _service = new NotesService(_dbContext);
     }
@@ -125,7 +128,6 @@ public class NoteServiceTest
         notes.Items.Count().ShouldBeGreaterThan(0);
     }
     
-    [TestCase]
     [TearDown]
     public async Task TearDown()
     {
