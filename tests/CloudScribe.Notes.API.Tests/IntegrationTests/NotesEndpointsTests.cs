@@ -53,7 +53,6 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task CreateNote_ReturnsBadRequest_WhenTitleIsTooLong()
     {
-
         var request = new CreateNoteRequest(new string('a', 201), "Test Content");
         
         var response = await Client.PostAsJsonAsync("/api/notes", request);
@@ -64,12 +63,9 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task CreateNote_ReturnsBadRequest_WhenContentIsEmpty()
     {
-
         var request = new CreateNoteRequest("Test Title", "");
 
-
         var response = await Client.PostAsJsonAsync("/api/notes", request);
-
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
@@ -77,19 +73,14 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task GetNoteById_ReturnsNote_WhenNoteExists()
     {
+        var existedNote = await CreateNoteAndSave("Test Title", "Test Content");
 
-        var createRequest = new CreateNoteRequest("Test Title", "Test Content");
-        var createResponse = await Client.PostAsJsonAsync("/api/notes", createRequest);
-        var createdNote = await createResponse.Content.ReadFromJsonAsync<NoteDto>();
-
-
-        var response = await Client.GetAsync($"/api/notes/{createdNote!.Id}");
-
+        var response = await Client.GetAsync($"/api/notes/{existedNote.Id}");
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var note = await response.Content.ReadFromJsonAsync<NoteDto>();
         note.ShouldNotBeNull();
-        note.Id.ShouldBe(createdNote.Id);
+        note.Id.ShouldBe(existedNote.Id);
         note.Title.ShouldBe("Test Title");
         note.Content.ShouldBe("Test Content");
     }
@@ -97,49 +88,37 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task GetNoteById_ReturnsNotFound_WhenNoteDoesNotExist()
     {
-
         var nonExistentId = Guid.NewGuid();
 
-
         var response = await Client.GetAsync($"/api/notes/{nonExistentId}");
-
-
+        
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Test]
     public async Task UpdateNote_ReturnsOk_WithUpdatedNote()
     {
-
-        var createRequest = new CreateNoteRequest("Original Title", "Original Content");
-        var createResponse = await Client.PostAsJsonAsync("/api/notes", createRequest);
-        var createdNote = await createResponse.Content.ReadFromJsonAsync<NoteDto>();
-
+        var existedNote = await CreateNoteAndSave("Original Title", "Original Content");
         var updateRequest = new UpdateNoteRequest("Updated Title", "Updated Content");
-
-
-        var response = await Client.PutAsJsonAsync($"/api/notes/{createdNote!.Id}", updateRequest);
-
+        
+        var response = await Client.PutAsJsonAsync($"/api/notes/{existedNote.Id}", updateRequest);
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var updatedNote = await response.Content.ReadFromJsonAsync<NoteDto>();
         updatedNote.ShouldNotBeNull();
-        updatedNote.Id.ShouldBe(createdNote.Id);
+        updatedNote.Id.ShouldBe(existedNote.Id);
         updatedNote.Title.ShouldBe("Updated Title");
         updatedNote.Content.ShouldBe("Updated Content");
-        updatedNote.ModifiedUtc.ShouldBeGreaterThan(createdNote.CreatedUtc);
+        updatedNote.ModifiedUtc.ShouldBeGreaterThan(existedNote.CreatedUtc);
     }
 
     [Test]
     public async Task UpdateNote_ReturnsNotFound_WhenNoteDoesNotExist()
     {
-
         var nonExistentId = Guid.NewGuid();
         var updateRequest = new UpdateNoteRequest("Updated Title", "Updated Content");
 
-
         var response = await Client.PutAsJsonAsync($"/api/notes/{nonExistentId}", updateRequest);
-
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
@@ -147,17 +126,10 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task UpdateNote_ReturnsBadRequest_WhenTitleIsEmpty()
     {
-
-        var createRequest = new CreateNoteRequest("Original Title", "Original Content");
-        var createResponse = await Client.PostAsJsonAsync("/api/notes", createRequest);
-        //var jsonString = await createResponse.Content.ReadAsStringAsync();
-        var createdNote = await createResponse.Content.ReadFromJsonAsync<NoteDto>();
-
+        var existedNote = await CreateNoteAndSave("Original Title", "Original Content");
         var updateRequest = new UpdateNoteRequest("", "Updated Content");
 
-
-        var response = await Client.PutAsJsonAsync($"/api/notes/{createdNote!.Id}", updateRequest);
-
+        var response = await Client.PutAsJsonAsync($"/api/notes/{existedNote.Id}", updateRequest);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
     }
@@ -165,31 +137,21 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task DeleteNote_ReturnsNoContent_WhenNoteExists()
     {
-
-        var createRequest = new CreateNoteRequest("Test Title", "Test Content");
-        var createResponse = await Client.PostAsJsonAsync("/api/notes", createRequest);
-        var createdNote = await createResponse.Content.ReadFromJsonAsync<NoteDto>();
-
-
-        var response = await Client.DeleteAsync($"/api/notes/{createdNote!.Id}");
-
+        var existedNote = await CreateNoteAndSave("Test Title", "Test Content");
+        var response = await Client.DeleteAsync($"/api/notes/{existedNote.Id}");
 
         response.StatusCode.ShouldBe(HttpStatusCode.NoContent);
-
-        // Verify note is actually deleted
-        var getResponse = await Client.GetAsync($"/api/notes/{createdNote.Id}");
+        
+        var getResponse = await Client.GetAsync($"/api/notes/{existedNote.Id}");
         getResponse.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 
     [Test]
     public async Task DeleteNote_ReturnsNotFound_WhenNoteDoesNotExist()
     {
-
         var nonExistentId = Guid.NewGuid();
 
-
         var response = await Client.DeleteAsync($"/api/notes/{nonExistentId}");
-
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
@@ -202,10 +164,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
             var request = new CreateNoteRequest($"Note {i}", $"Content {i}");
             await Client.PostAsJsonAsync("/api/notes", request);
         }
-
-
         var response = await Client.GetAsync("/api/notes?pageNumber=1&pageSize=3");
-
 
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
         var result = await response.Content.ReadFromJsonAsync<PagedResult<NoteDto>>();
