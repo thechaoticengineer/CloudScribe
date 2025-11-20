@@ -3,7 +3,6 @@ using System.Net.Http.Json;
 using CloudScribe.Contracts.Notes;
 using CloudScribe.Notes.API.Domain;
 using CloudScribe.SharedKernel;
-using Shouldly;
 
 namespace CloudScribe.Notes.API.Tests.IntegrationTests;
 

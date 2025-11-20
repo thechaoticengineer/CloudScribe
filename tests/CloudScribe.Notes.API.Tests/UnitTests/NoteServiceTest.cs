@@ -1,8 +1,6 @@
 using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using CloudScribe.Notes.API.Services;
-using Microsoft.EntityFrameworkCore;
-using Shouldly;
 
 namespace CloudScribe.Notes.API.Tests.UnitTests;
 

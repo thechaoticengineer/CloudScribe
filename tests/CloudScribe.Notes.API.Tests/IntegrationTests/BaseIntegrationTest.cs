@@ -1,6 +1,4 @@
 using CloudScribe.Notes.API.Infrastructure.Data;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace CloudScribe.Notes.API.Tests.IntegrationTests;
 
