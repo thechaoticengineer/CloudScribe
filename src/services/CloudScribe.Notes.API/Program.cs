@@ -1,5 +1,6 @@
 using CloudScribe.Notes.API.Api.Endpoints;
 using CloudScribe.Notes.API.ExceptionHandling;
+using CloudScribe.Notes.API.Extensions;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using CloudScribe.Notes.API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -37,6 +38,7 @@ app.UseExceptionHandler();
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
+    app.ApplyMigrations();
     app.MapOpenApi();
 }
 
