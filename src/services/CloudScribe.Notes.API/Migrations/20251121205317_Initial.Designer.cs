@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace CloudScribe.Notes.API.Migrations
 {
     [DbContext(typeof(CloudScribeDbContext))]
-    [Migration("20251116181508_Initial")]
+    [Migration("20251121205317_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -29,27 +29,33 @@ namespace CloudScribe.Notes.API.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(5000)
-                        .HasColumnType("character varying(5000)");
+                        .HasColumnType("character varying(5000)")
+                        .HasColumnName("content");
 
                     b.Property<DateTime>("CreatedUtc")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_utc");
 
                     b.Property<DateTime>("ModifiedUtc")
-                        .HasColumnType("timestamp with time zone");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("modified_utc");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(200)
-                        .HasColumnType("character varying(200)");
+                        .HasColumnType("character varying(200)")
+                        .HasColumnName("title");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_notes");
 
-                    b.ToTable("Notes", (string)null);
+                    b.ToTable("notes", (string)null);
                 });
 #pragma warning restore 612, 618
         }

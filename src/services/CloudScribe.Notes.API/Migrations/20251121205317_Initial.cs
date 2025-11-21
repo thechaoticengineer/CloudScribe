@@ -12,18 +12,18 @@ namespace CloudScribe.Notes.API.Migrations
         protected override void Up(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.CreateTable(
-                name: "Notes",
+                name: "notes",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uuid", nullable: false),
-                    Title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
-                    Content = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: false),
-                    CreatedUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    ModifiedUtc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    id = table.Column<Guid>(type: "uuid", nullable: false),
+                    title = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: false),
+                    content = table.Column<string>(type: "character varying(5000)", maxLength: 5000, nullable: false),
+                    created_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    modified_utc = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Notes", x => x.Id);
+                    table.PrimaryKey("pk_notes", x => x.id);
                 });
         }
 
@@ -31,7 +31,7 @@ namespace CloudScribe.Notes.API.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Notes");
+                name: "notes");
         }
     }
 }

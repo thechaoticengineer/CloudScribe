@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <InternalsVisibleTo Include="CloudScribe.Notes.API.Tests" />
+        <PackageReference Include="EFCore.NamingConventions" Version="9.0.0" />
         <PackageReference Include="FluentValidation" Version="12.1.0" />
         <PackageReference Include="FluentValidation.DependencyInjectionExtensions" Version="12.1.0" />
         <PackageReference Include="JetBrains.Annotations" Version="2025.2.2" />
