@@ -6,7 +6,10 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri(builder.Configuration["ApiUrl"] ?? throw new InvalidOperationException("Missing ApiUrl configuration value"))
+});
 
 var app = builder.Build();
 
