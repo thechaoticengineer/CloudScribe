@@ -15,7 +15,7 @@ public partial class Notes(HttpClient http) : ComponentBase
         try
         {
             await http.PostAsJsonAsync("/api/notes", new CreateNoteRequest(Request.Title, Request.Content));
-            _notes = await http.GetFromJsonAsync<PagedResult<NoteDto>>("/api/notes?pageNumber=1&pageSize=10");
+            await LoadNotes();
             Request = new();
         }
         catch (Exception e)
@@ -28,11 +28,16 @@ public partial class Notes(HttpClient http) : ComponentBase
     {
         try
         {
-            _notes = await http.GetFromJsonAsync<PagedResult<NoteDto>>("/api/notes?pageNumber=1&pageSize=10");
+            await LoadNotes();
         }
         catch (Exception ex)
         {
         }
+    }
+    
+    private async Task LoadNotes()
+    {
+        _notes = await http.GetFromJsonAsync<PagedResult<NoteDto>>("/api/notes?pageNumber=1&pageSize=10");
     }
 }
 
