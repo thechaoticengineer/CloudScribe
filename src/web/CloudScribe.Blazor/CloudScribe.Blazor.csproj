@@ -6,4 +6,9 @@
         <ImplicitUsings>enable</ImplicitUsings>
     </PropertyGroup>
 
+    <ItemGroup>
+      <ProjectReference Include="..\..\shared\CloudScribe.Contracts\CloudScribe.Contracts.csproj" />
+      <ProjectReference Include="..\..\shared\CloudScribe.SharedKernel\CloudScribe.SharedKernel.csproj" />
+    </ItemGroup>
+
 </Project>

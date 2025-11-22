@@ -1,7 +1,44 @@
 @page "/notes"
 @rendermode InteractiveServer
-<h3>Notes</h3>
+<div>
+    <EditForm Model="@Request" OnValidSubmit="@OnSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary class="text-danger" />
+        <div class="mb-3">
+            <Label for="title">Title:</Label>
+            <InputText id="title" @bind-Value="Request.Title"/>
+            <ValidationMessage For="@(() => Request.Title)" class="text-danger" />
+        </div>
+        
+        <div class="mb-3">
+            <Label for="content">Content:</Label>
+            <InputTextArea id="content" @bind-Value="Request.Content"></InputTextArea>
+            <ValidationMessage For="@(() => Request.Content)" class="text-danger" />
+        </div>
+        
+        
+        <button type="submit">Submit</button>
+    </EditForm>
+</div>
 
-@code {
+<div>
+    @if (_notes == null)
+    {
+        <p><em>Loading....</em></p>
+    }
+    else
+    {
+        <ul>
+            @foreach (var note in _notes.Items)
+            {
+                <div>
+                    <p>@note.Title</p>
+                    <p>@note.Content</p>
+                </div>
+                <hr />
+            }    
+        </ul>
+        
+    }
     
-}
+</div>
