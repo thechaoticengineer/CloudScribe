@@ -18,7 +18,7 @@ public partial class Notes(HttpClient http) : ComponentBase
             await LoadNotes();
             Request = new();
         }
-        catch (Exception e)
+        catch (Exception)
         {
         }
         
@@ -30,7 +30,7 @@ public partial class Notes(HttpClient http) : ComponentBase
         {
             await LoadNotes();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
         }
     }
@@ -38,6 +38,19 @@ public partial class Notes(HttpClient http) : ComponentBase
     private async Task LoadNotes()
     {
         _notes = await http.GetFromJsonAsync<PagedResult<NoteDto>>("/api/notes?pageNumber=1&pageSize=10");
+    }
+
+    private async Task DeleteNote(Guid noteId)
+    {
+        var response = await http.DeleteAsync($"/api/notes/{noteId}");
+        if (response.IsSuccessStatusCode)
+        {
+            await LoadNotes();
+        }
+        else
+        {
+            // show snackbar later. 
+        }
     }
 }
 
