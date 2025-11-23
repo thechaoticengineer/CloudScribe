@@ -11,4 +11,8 @@
       <ProjectReference Include="..\..\shared\CloudScribe.SharedKernel\CloudScribe.SharedKernel.csproj" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="MudBlazor" Version="8.15.0" />
+    </ItemGroup>
+
 </Project>
