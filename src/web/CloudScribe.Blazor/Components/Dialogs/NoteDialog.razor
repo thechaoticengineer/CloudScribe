@@ -1,0 +1,37 @@
+<h3>NoteDialog</h3>
+
+<MudDialog>
+    <DialogContent>
+        <EditForm EditContext="@_editContext" Model="@Model">
+            <DataAnnotationsValidator />
+            
+            <MudGrid>
+                <MudItem xs="12">
+                    <MudTextField Label="Tytuł" 
+                                  @bind-Value="Model.Title"
+                                  For="@(() => Model.Title)" 
+                                  Variant="Variant.Outlined" 
+                                  Adornment="Adornment.Start" 
+                                  AdornmentIcon="@Icons.Material.Filled.Title" />
+                </MudItem>
+                
+                <MudItem xs="12">
+                    <MudTextField Label="Treść" 
+                                  @bind-Value="Model.Content"
+                                  For="@(() => Model.Content)"
+                                  Variant="Variant.Outlined"
+                                  Lines="5" />
+                </MudItem>
+            </MudGrid>
+        </EditForm>
+    </DialogContent>
+    
+    <DialogActions>
+        <MudButton OnClick="Cancel">Anuluj</MudButton>
+        <MudButton Color="Color.Primary" OnClick="Submit">Zapisz</MudButton>
+    </DialogActions>
+</MudDialog>
+
+@code {
+    
+}
