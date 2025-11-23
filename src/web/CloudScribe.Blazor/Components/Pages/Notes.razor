@@ -1,45 +1,49 @@
 @page "/notes"
 @rendermode InteractiveServer
-<div>
-    <EditForm Model="@Request" OnValidSubmit="@OnSubmit">
-        <DataAnnotationsValidator />
-        <ValidationSummary class="text-danger" />
-        <div class="mb-3">
-            <label for="title">Title:</label>
-            <InputText id="title" @bind-Value="Request.Title"/>
-            <ValidationMessage For="@(() => Request.Title)" class="text-danger" />
-        </div>
-        
-        <div class="mb-3">
-            <label for="content">Content:</label>
-            <InputTextArea id="content" @bind-Value="Request.Content"></InputTextArea>
-            <ValidationMessage For="@(() => Request.Content)" class="text-danger" />
-        </div>
-        
-        
-        <button type="submit" class="bg-primary text-bg-primary">Submit</button>
-    </EditForm>
-</div>
 
-<div>
-    @if (_notes == null)
-    {
-        <p><em>Loading....</em></p>
-    }
-    else
-    {
-        <ul>
-            @foreach (var note in _notes.Items)
-            {
-                <div>
-                    <p>@note.Title</p>
-                    <p>@note.Content</p>
-                    <button @onclick="() => DeleteNote(note.Id)" class="bg-danger text-bg-danger" >Delete</button>
-                </div>
-                <hr />
-            }    
-        </ul>
+<MudContainer>
+    <div>
+        <EditForm Model="@Request" OnValidSubmit="@OnSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary class="text-danger" />
+            <div class="mb-3">
+                <label for="title">Title:</label>
+                <InputText id="title" @bind-Value="Request.Title"/>
+                <ValidationMessage For="@(() => Request.Title)" class="text-danger" />
+            </div>
         
-    }
+            <div class="mb-3">
+                <label for="content">Content:</label>
+                <InputTextArea id="content" @bind-Value="Request.Content"></InputTextArea>
+                <ValidationMessage For="@(() => Request.Content)" class="text-danger" />
+            </div>
+        
+        
+            <button type="submit" class="bg-primary text-bg-primary">Submit</button>
+        </EditForm>
+    </div>
+
+    <div>
+        @if (_notes == null)
+        {
+            <p><em>Loading....</em></p>
+        }
+        else
+        {
+            <ul>
+                @foreach (var note in _notes.Items)
+                {
+                    <div>
+                        <p>@note.Title</p>
+                        <p>@note.Content</p>
+                        <button @onclick="() => DeleteNote(note.Id)" class="bg-danger text-bg-danger" >Delete</button>
+                    </div>
+                    <hr />
+                }    
+            </ul>
+        
+        }
     
-</div>
+    </div>  
+</MudContainer>
+
