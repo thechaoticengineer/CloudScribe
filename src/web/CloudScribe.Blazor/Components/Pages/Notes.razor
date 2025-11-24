@@ -2,26 +2,13 @@
 @rendermode InteractiveServer
 
 <MudContainer>
-    <div>
-        <EditForm Model="@Request" OnValidSubmit="@OnSubmit">
-            <DataAnnotationsValidator/>
-            <ValidationSummary class="text-danger"/>
-            <div class="mb-3">
-                <label for="title">Title:</label>
-                <InputText id="title" @bind-Value="Request.Title"/>
-                <ValidationMessage For="@(() => Request.Title)" class="text-danger"/>
-            </div>
 
-            <div class="mb-3">
-                <label for="content">Content:</label>
-                <InputTextArea id="content" @bind-Value="Request.Content"></InputTextArea>
-                <ValidationMessage For="@(() => Request.Content)" class="text-danger"/>
-            </div>
-
-
-            <button type="submit" class="bg-primary text-bg-primary">Submit</button>
-        </EditForm>
-    </div>
+    <MudButton Variant="Variant.Filled"
+               Color="Color.Primary"
+               StartIcon="@Icons.Material.Filled.Add"
+               OnClick="@(() => OpenDialog(null))">
+        Add note
+    </MudButton>
 
     @if (_notes == null)
     {
@@ -37,13 +24,14 @@
                 <MudTh>Akcje</MudTh>
             </HeaderContent>
             <RowTemplate>
-                <MudTd DataLabel="Tytuł">@context.Title</MudTd>
-                <MudTd DataLabel="Treść">
+                <MudTd DataLabel="Title">@context.Title</MudTd>
+                <MudTd DataLabel="Content">
                     @(context.Content.Length > 50 ? context.Content[..50] + "..." : context.Content)
                 </MudTd>
-                <MudTd DataLabel="Utworzono">@context.CreatedUtc.ToLocalTime().ToString("g")</MudTd>
+                <MudTd DataLabel="Created">@context.CreatedUtc.ToLocalTime().ToString("g")</MudTd>
                 <MudTd>
-                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"/>
+                    <MudIconButton Icon="@Icons.Material.Filled.Edit" Color="Color.Primary"
+                                   OnClick="@(() => OpenDialog(context))"/>
                     <MudIconButton Icon="@Icons.Material.Filled.Delete" Color="Color.Error"
                                    OnClick="@(() => DeleteNote(context.Id))"/>
                 </MudTd>

@@ -1,4 +1,5 @@
 using CloudScribe.Blazor.Components;
+using CloudScribe.Blazor.Services;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,9 +10,9 @@ builder.Services.AddRazorComponents()
 
 builder.Services.AddMudServices();
 
-builder.Services.AddScoped(sp => new HttpClient
+builder.Services.AddHttpClient<NotesClient>(client =>
 {
-    BaseAddress = new Uri(builder.Configuration["ApiUrl"] ?? throw new InvalidOperationException("Missing ApiUrl configuration value"))
+    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"] ?? throw new InvalidOperationException("ApiUrl is missing"));
 });
 
 var app = builder.Build();

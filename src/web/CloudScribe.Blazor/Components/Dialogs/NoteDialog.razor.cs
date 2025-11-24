@@ -7,9 +7,14 @@ namespace CloudScribe.Blazor.Components.Dialogs;
 
 public partial class NoteDialog : ComponentBase
 {
-    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = default!;
+    [CascadingParameter] IMudDialogInstance MudDialog { get; set; } = null!;
     [Parameter] public NoteFormModel Model { get; set; } = new();
     private EditContext _editContext = null!;
+    
+    protected override void OnInitialized()
+    {
+        _editContext = new EditContext(Model);
+    }
 
     private void Cancel() => MudDialog.Cancel();
 
