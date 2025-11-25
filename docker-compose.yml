@@ -58,12 +58,27 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: [ "CMD-SHELL", "exec 3<>/dev/tcp/localhost/8080 && echo -e 'GET /health/ready HTTP/1.1\r\nHost: localhost\r\n\r\n' >&3 && cat <&3 | grep -q '200 OK'" ]
-      interval: 30s
-      timeout: 10s
-      retries: 5
-      start_period: 60s
-
+      test: [ "CMD", "bash", "-c", "cat < /dev/null > /dev/tcp/127.0.0.1/8080" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    
+  keycloak-setup:
+    image: quay.io/keycloak/keycloak:latest
+    container_name: cloudscribe-keycloak-setup
+    depends_on:
+      keycloak:
+        condition: service_healthy
+    volumes:
+      - ./infrastructure/keycloak/setup-internal.sh:/opt/keycloak/setup.sh
+    entrypoint: [ "/bin/bash", "/opt/keycloak/setup.sh" ]
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KEYCLOAK_CLIENT_SECRET: ${KEYCLOAK_CLIENT_SECRET}
+    networks:
+      - cloudscribe-network
 
 volumes:
   postgres_data:
