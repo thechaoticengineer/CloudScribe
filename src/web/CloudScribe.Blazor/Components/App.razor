@@ -1,8 +1,4 @@
-﻿@using CloudScribe.Blazor.Services
-@using Microsoft.AspNetCore.Authentication
-@inject TokenProvider TokenProvider
-
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 
 <head>
@@ -25,25 +21,3 @@
 </body>
 
 </html>
-
-@code {
-    [CascadingParameter]
-    private HttpContext HttpContext { get; set; } = null!;
-
-    protected override async Task OnInitializedAsync()
-    {
-        if (HttpContext != null)
-        {
-            // Wyciągamy token, który zapisał OIDC (dzięki opcji SaveTokens = true)
-            var accessToken = await HttpContext.GetTokenAsync("access_token");
-            var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
-
-            // Przekazujemy go do serwisu Scoped, żeby był dostępny w całej sesji Blazora
-            if (accessToken != null)
-            {
-                TokenProvider.AccessToken = accessToken;
-                TokenProvider.RefreshToken = refreshToken;
-            }
-        }
-    }
-}

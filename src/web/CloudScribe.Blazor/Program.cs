@@ -31,17 +31,31 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("email");
+        
+        options.TokenValidationParameters.NameClaimType = "preferred_username";
+        options.Events = new OpenIdConnectEvents
+        {
+            OnTokenValidated = context =>
+            {
+                var accessToken = context.SecurityToken.RawData;
+                
+                var identity = (System.Security.Claims.ClaimsIdentity)context.Principal!.Identity!;
+                identity.AddClaim(new System.Security.Claims.Claim("access_token", accessToken));
+            
+                return Task.CompletedTask;
+            }
+        };
     });
 
 builder.Services.AddCascadingAuthenticationState();
 
-builder.Services.AddScoped<TokenProvider>();
 builder.Services.AddTransient<AuthorizationMessageHandler>();
 builder.Services.AddHttpClient<NotesClient>(client =>
 {
-    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"] ?? throw new InvalidOperationException("ApiUrl is missing"));
-})
-.AddHttpMessageHandler<AuthorizationMessageHandler>();
+    client.BaseAddress =
+        new Uri(builder.Configuration["ApiUrl"] ?? throw new InvalidOperationException("ApiUrl is missing"));
+});
+//.AddHttpMessageHandler<AuthorizationMessageHandler>();
 
 var app = builder.Build();
 
