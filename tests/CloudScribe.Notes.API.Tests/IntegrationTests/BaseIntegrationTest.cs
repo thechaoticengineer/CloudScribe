@@ -1,5 +1,7 @@
+using System.Net.Http.Headers;
 using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Infrastructure.Data;
+using CloudScribe.Notes.API.Tests.Helpers;
 
 namespace CloudScribe.Notes.API.Tests.IntegrationTests;
 
@@ -46,5 +48,12 @@ public abstract class BaseIntegrationTest
         DbContext.Notes.Add(note);
         await DbContext.SaveChangesAsync();
         return note;
+    }
+    
+    protected void AuthenticateAsync(string userId = "test-user-id")
+    {
+        var token = TestAuthHandler.GenerateJwtToken(userId);
+        Client.DefaultRequestHeaders.Authorization = 
+            new AuthenticationHeaderValue("Bearer", token);
     }
 }

@@ -14,6 +14,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task GetAllNotes_ReturnsEmptyList_WhenNoNotesExist()
     {
+        AuthenticateAsync();
         var response = await Client.GetAsync("/api/notes");
         
         response.StatusCode.ShouldBe(HttpStatusCode.OK);
@@ -26,6 +27,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task CreateNote_ReturnsCreated_WithValidRequest()
     {
+        AuthenticateAsync();
         var request = new CreateNoteRequest("Test Title", "Test Content");
         
         var response = await Client.PostAsJsonAsync("/api/notes", request);
@@ -43,6 +45,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task CreateNote_ReturnsBadRequest_WhenTitleIsEmpty()
     {
+        AuthenticateAsync();
         var request = new CreateNoteRequest("", "Test Content");
         
         var response = await Client.PostAsJsonAsync("/api/notes", request);
@@ -53,6 +56,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task CreateNote_ReturnsBadRequest_WhenTitleIsTooLong()
     {
+        AuthenticateAsync();
         var request = new CreateNoteRequest(new string('a', 201), "Test Content");
         
         var response = await Client.PostAsJsonAsync("/api/notes", request);
@@ -63,6 +67,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task CreateNote_ReturnsBadRequest_WhenContentIsEmpty()
     {
+        AuthenticateAsync();
         var request = new CreateNoteRequest("Test Title", "");
 
         var response = await Client.PostAsJsonAsync("/api/notes", request);
@@ -73,6 +78,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task GetNoteById_ReturnsNote_WhenNoteExists()
     {
+        AuthenticateAsync();
         var existedNote = await CreateNoteAndSave("Test Title", "Test Content");
 
         var response = await Client.GetAsync($"/api/notes/{existedNote.Id}");
@@ -88,6 +94,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task GetNoteById_ReturnsNotFound_WhenNoteDoesNotExist()
     {
+        AuthenticateAsync();
         var nonExistentId = Guid.NewGuid();
 
         var response = await Client.GetAsync($"/api/notes/{nonExistentId}");
@@ -98,6 +105,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task UpdateNote_ReturnsOk_WithUpdatedNote()
     {
+        AuthenticateAsync();
         var existedNote = await CreateNoteAndSave("Original Title", "Original Content");
         var updateRequest = new UpdateNoteRequest("Updated Title", "Updated Content");
         
@@ -115,6 +123,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task UpdateNote_ReturnsNotFound_WhenNoteDoesNotExist()
     {
+        AuthenticateAsync();
         var nonExistentId = Guid.NewGuid();
         var updateRequest = new UpdateNoteRequest("Updated Title", "Updated Content");
 
@@ -126,6 +135,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task UpdateNote_ReturnsBadRequest_WhenTitleIsEmpty()
     {
+        AuthenticateAsync();
         var existedNote = await CreateNoteAndSave("Original Title", "Original Content");
         var updateRequest = new UpdateNoteRequest("", "Updated Content");
 
@@ -137,6 +147,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task DeleteNote_ReturnsNoContent_WhenNoteExists()
     {
+        AuthenticateAsync();
         var existedNote = await CreateNoteAndSave("Test Title", "Test Content");
         var response = await Client.DeleteAsync($"/api/notes/{existedNote.Id}");
 
@@ -149,6 +160,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task DeleteNote_ReturnsNotFound_WhenNoteDoesNotExist()
     {
+        AuthenticateAsync();
         var nonExistentId = Guid.NewGuid();
 
         var response = await Client.DeleteAsync($"/api/notes/{nonExistentId}");
@@ -159,6 +171,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task GetAllNotes_ReturnsPaginatedResults()
     {
+        AuthenticateAsync();
         for (int i = 1; i <= 5; i++)
         {
             var request = new CreateNoteRequest($"Note {i}", $"Content {i}");
@@ -179,6 +192,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task GetAllNotes_ReturnsNotesOrderedByCreatedDateDescending()
     {
+        AuthenticateAsync();
         var note1 = new CreateNoteRequest("First Note", "Content 1");
         var note2 = new CreateNoteRequest("Second Note", "Content 2");
         var note3 = new CreateNoteRequest("Third Note", "Content 3");
@@ -200,5 +214,13 @@ public class NotesEndpointsTests : BaseIntegrationTest
         notes[0].Title.ShouldBe("Third Note");
         notes[1].Title.ShouldBe("Second Note");
         notes[2].Title.ShouldBe("First Note");
+    }
+    
+    [Test]
+    public async Task GetNotes_ReturnsUnauthorized_WhenUserIsNotAuthenticated()
+    {
+        var response = await Client.GetAsync("/api/notes");
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);
     }
 }
