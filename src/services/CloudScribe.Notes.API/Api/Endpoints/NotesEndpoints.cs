@@ -13,7 +13,8 @@ public static class NotesEndpoints
     {
         var group = app.MapGroup("/api/notes")
             .WithTags("Notes")
-            .WithOpenApi();
+            .WithOpenApi()
+            .RequireAuthorization();
 
         group.MapGet("", async (NotesService service, int pageNumber = 1, int pageSize = 10) =>
                 Results.Ok(await service.GetAll(pageNumber, pageSize)))

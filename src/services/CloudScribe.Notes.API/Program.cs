@@ -5,6 +5,8 @@ using CloudScribe.Notes.API.Infrastructure.Data;
 using CloudScribe.Notes.API.Services;
 using Microsoft.EntityFrameworkCore;
 using FluentValidation;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +19,25 @@ builder.Services.AddDbContext<CloudScribeDbContext>(options =>
         .UseNpgsql(builder.Configuration.GetConnectionString("DefaultConnection"))
         .UseSnakeCaseNamingConvention());
 
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        var authSettings = builder.Configuration.GetSection("Authentication");
+        
+        options.Authority = authSettings["Authority"];
+        options.MetadataAddress = authSettings["MetadataAddress"]!;
+        options.RequireHttpsMetadata = bool.Parse(authSettings["RequireHttpsMetadata"]!);
+        
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateAudience = false,
+            ValidateIssuer = true,
+            ValidIssuer = authSettings["Authority"],
+            ValidateLifetime = true
+        };
+    });
+
+builder.Services.AddAuthorization();
 builder.Services.AddScoped<NotesService>();
 
 builder.Services.AddProblemDetails();
