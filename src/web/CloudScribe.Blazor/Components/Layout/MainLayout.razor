@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Components.Authorization
+@inherits LayoutComponentBase
 
 <MudThemeProvider />
 <MudPopoverProvider />
@@ -9,6 +10,24 @@
     <MudAppBar>
         <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
         CloudScribe
+        
+        <MudSpacer />
+    
+        <AuthorizeView>
+            <Authorized>
+                <MudText Class="mr-4">Hello, @context.User.Identity?.Name</MudText>
+            
+                <form action="authentication/logout" method="post" style="display:inline;">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="ReturnUrl" value="" />
+                    <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Secondary">Logout</MudButton>
+                </form>
+            </Authorized>
+            <NotAuthorized>
+                <MudButton Href="authentication/login" Target="_top" Variant="Variant.Filled" Color="Color.Success">Login</MudButton>
+            </NotAuthorized>
+        </AuthorizeView>
+        
     </MudAppBar>
     <MudDrawer @bind-Open="@_drawerOpen">
         <NavMenu/>
