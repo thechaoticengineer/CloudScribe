@@ -1,6 +1,7 @@
 using CloudScribe.Blazor.Components;
 using CloudScribe.Blazor.Endpoints;
 using CloudScribe.Blazor.Services;
+using CloudScribe.Blazor.Services.Auth;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using MudBlazor.Services;
@@ -10,6 +11,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
+
+builder.Services.AddHttpContextAccessor()
+    .AddTransient<AuthorizationHandler>();
 
 builder.Services.AddMudServices();
 
@@ -47,16 +51,14 @@ builder.Services.AddAuthentication(options =>
         };
     });
 
-builder.Services.AddCascadingAuthenticationState();
-
-builder.Services.AddTransient<AuthorizationMessageHandler>();
 builder.Services.AddHttpClient<NotesClient>(client =>
 {
     client.BaseAddress =
         new Uri(builder.Configuration["ApiUrl"] ?? throw new InvalidOperationException("ApiUrl is missing"));
-});
-//.AddHttpMessageHandler<AuthorizationMessageHandler>();
+}).AddHttpMessageHandler<AuthorizationHandler>();
 
+builder.Services.AddAuthorization();
+builder.Services.AddCascadingAuthenticationState();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
