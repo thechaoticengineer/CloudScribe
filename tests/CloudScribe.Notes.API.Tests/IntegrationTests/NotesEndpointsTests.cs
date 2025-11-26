@@ -219,6 +219,7 @@ public class NotesEndpointsTests : BaseIntegrationTest
     [Test]
     public async Task GetNotes_ReturnsUnauthorized_WhenUserIsNotAuthenticated()
     {
+        ClearAuthentication();
         var response = await Client.GetAsync("/api/notes");
 
         response.StatusCode.ShouldBe(HttpStatusCode.Unauthorized);

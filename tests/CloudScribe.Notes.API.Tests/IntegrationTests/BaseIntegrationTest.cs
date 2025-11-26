@@ -56,4 +56,9 @@ public abstract class BaseIntegrationTest
         Client.DefaultRequestHeaders.Authorization = 
             new AuthenticationHeaderValue("Bearer", token);
     }
+
+    protected void ClearAuthentication()
+    {
+        Client.DefaultRequestHeaders.Authorization = null;
+    }
 }
