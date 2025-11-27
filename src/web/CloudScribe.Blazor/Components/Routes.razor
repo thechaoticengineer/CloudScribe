@@ -23,8 +23,6 @@
     
     protected override async Task OnInitializedAsync()
     {
-        //_subscription = ApplicationState.RegisterOnPersisting(PersistTokens);
-
         if (ApplicationState.TryTakeFromJson<TokenState>("AuthTokens", out var restoredState))
         {
             if (restoredState is not null)
