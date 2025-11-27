@@ -12,8 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
-builder.Services.AddHttpContextAccessor()
-    .AddTransient<AuthorizationHandler>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddMudServices();
 
@@ -35,6 +34,7 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("email");
+        options.Scope.Add("offline_access");
         
         options.TokenValidationParameters.NameClaimType = "preferred_username";
         options.Events = new OpenIdConnectEvents
@@ -50,6 +50,8 @@ builder.Services.AddAuthentication(options =>
             }
         };
     });
+
+builder.Services.AddScoped<AuthorizationHandler>();
 
 builder.Services.AddHttpClient<NotesClient>(client =>
 {
