@@ -50,14 +50,14 @@ builder.Services.AddAuthentication(options =>
             }
         };
     });
+builder.Services.AddScoped<TokenService>();
 
-builder.Services.AddScoped<AuthorizationHandler>();
+builder.Services.AddScoped<NotesClient>();
 
-builder.Services.AddHttpClient<NotesClient>(client =>
+builder.Services.AddHttpClient("API", client => 
 {
-    client.BaseAddress =
-        new Uri(builder.Configuration["ApiUrl"] ?? throw new InvalidOperationException("ApiUrl is missing"));
-}).AddHttpMessageHandler<AuthorizationHandler>();
+    client.BaseAddress = new Uri(builder.Configuration["ApiUrl"]!);
+});
 
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();

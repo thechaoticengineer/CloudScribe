@@ -1,29 +1,49 @@
 using System.Net.Http.Headers;
+using CloudScribe.Blazor.Services.Auth;
 using CloudScribe.Contracts.Notes;
 using CloudScribe.SharedKernel;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace CloudScribe.Blazor.Services;
 
-public class NotesClient(HttpClient http)
+public class NotesClient(IHttpClientFactory factory, TokenService tokenService)
 {
+    private async Task<HttpClient> CreateClientAsync()
+    {
+        
+        var client = factory.CreateClient("API");
+        
+        var token = await tokenService.GetAccessTokenAsync();
+        
+        if (!string.IsNullOrEmpty(token))
+        {
+            client.DefaultRequestHeaders.Authorization = 
+                new AuthenticationHeaderValue("Bearer", token);
+        }
+
+        return client;
+    }
     public async Task<PagedResult<NoteDto>?> GetNotesAsync(int pageNumber = 1, int pageSize = 10)
     {
-        return await http.GetFromJsonAsync<PagedResult<NoteDto>>($"/api/notes?pageNumber={pageNumber}&pageSize={pageSize}");
+        var client = await CreateClientAsync();
+        return await client.GetFromJsonAsync<PagedResult<NoteDto>>($"/api/notes?pageNumber={pageNumber}&pageSize={pageSize}");
     }
 
     public async Task CreateNoteAsync(CreateNoteRequest request)
     {
-        await http.PostAsJsonAsync("/api/notes", request);
+        var client = await CreateClientAsync();
+        await client.PostAsJsonAsync("/api/notes", request);
     }
 
     public async Task UpdateNoteAsync(Guid id, UpdateNoteRequest request)
     {
-        await http.PutAsJsonAsync($"/api/notes/{id}", request);
+        var client = await CreateClientAsync();
+        await client.PutAsJsonAsync($"/api/notes/{id}", request);
     }
 
     public async Task<HttpResponseMessage> DeleteNoteAsync(Guid id)
     {
-        return await http.DeleteAsync($"/api/notes/{id}");
+        var client = await CreateClientAsync();
+        return await client.DeleteAsync($"/api/notes/{id}");
     }
 }

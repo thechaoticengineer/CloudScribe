@@ -34,7 +34,7 @@ public partial class Notes(NotesClient notesClient, IDialogService dialogService
         {
             await LoadNotes();
         }
-        catch (Exception e)
+        catch (Exception)
         {
             snackbar.Add("Error loading notes", Severity.Error);
         }

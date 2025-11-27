@@ -1,4 +1,11 @@
-﻿@using Microsoft.AspNetCore.Components.Authorization
+﻿@using System.Globalization
+@using CloudScribe.Blazor.Services.Auth
+@using Microsoft.AspNetCore.Authentication
+@using Microsoft.AspNetCore.Components.Authorization
+@inject TokenService TokenService
+@inject PersistentComponentState ApplicationState
+@implements IDisposable
+
 <CascadingAuthenticationState>
     <Router AppAssembly="typeof(Program).Assembly">
         <Found Context="routeData">
@@ -7,3 +14,55 @@
         </Found>
     </Router>
 </CascadingAuthenticationState>
+
+@code {
+    [CascadingParameter] 
+    private HttpContext? HttpContext { get; set; }
+    
+    private PersistingComponentStateSubscription _subscription;
+    
+    protected override async Task OnInitializedAsync()
+    {
+        //_subscription = ApplicationState.RegisterOnPersisting(PersistTokens);
+
+        if (ApplicationState.TryTakeFromJson<TokenState>("AuthTokens", out var restoredState))
+        {
+            if (restoredState is not null)
+            {
+                TokenService.Initialize(restoredState.AccessToken, restoredState.RefreshToken, restoredState.ExpiresAt);
+            }
+        }
+        else if (HttpContext is not null)
+        {
+            var accessToken = await HttpContext.GetTokenAsync("access_token");
+            var refreshToken = await HttpContext.GetTokenAsync("refresh_token");
+            var expiresAtRaw = await HttpContext.GetTokenAsync("expires_at");
+
+            if (accessToken != null && refreshToken != null && expiresAtRaw != null)
+            {
+                if (DateTimeOffset.TryParse(expiresAtRaw, CultureInfo.InvariantCulture, DateTimeStyles.None, out var expiresAt))
+                {
+                    TokenService.Initialize(accessToken, refreshToken, expiresAt);
+                    _subscription = ApplicationState.RegisterOnPersisting(PersistTokens);
+                }
+            }
+        }
+    }
+
+    private Task PersistTokens()
+    {
+        if(TokenService.AccessToken != null)
+        {
+            var state = new TokenState(TokenService.AccessToken, TokenService.RefreshToken, TokenService.ExpiresAt);
+            ApplicationState.PersistAsJson("AuthTokens", state);
+        }
+        return Task.CompletedTask;
+    }
+
+    public void Dispose()
+    {
+        _subscription.Dispose();
+    }
+    
+    private record TokenState(string AccessToken, string? RefreshToken, DateTimeOffset ExpiresAt);
+}
