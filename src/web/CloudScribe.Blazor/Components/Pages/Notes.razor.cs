@@ -13,21 +13,6 @@ public partial class Notes(NotesClient notesClient, IDialogService dialogService
     private PagedResult<NoteDto>? _notes;
     
 
-    private async Task OnSubmit()
-    {
-        try
-        {
-            await notesClient.CreateNoteAsync(new CreateNoteRequest(Request.Title, Request.Content));
-            await LoadNotes();
-            Request = new();
-        }
-        catch (Exception)
-        {
-            snackbar.Add("Error creating note", Severity.Error);
-        }
-        
-    }
-
     protected override async Task OnInitializedAsync()
     {
         try
@@ -47,8 +32,8 @@ public partial class Notes(NotesClient notesClient, IDialogService dialogService
 
     private async Task DeleteNote(Guid noteId)
     {
-        var response = await notesClient.DeleteNoteAsync(noteId);
-        if (response.IsSuccessStatusCode)
+        var isSuccess = await notesClient.DeleteNoteAsync(noteId);
+        if (isSuccess)
         {
             await LoadNotes();
         }
@@ -96,19 +81,19 @@ public partial class Notes(NotesClient notesClient, IDialogService dialogService
                 {
                     var updateRequest = new UpdateNoteRequest(data.Title, data.Content);
                     await notesClient.UpdateNoteAsync(noteToEdit.Id, updateRequest);
-                    snackbar.Add("Notatka zaktualizowana", Severity.Success);
+                    snackbar.Add("Note updated", Severity.Success);
                 }
                 else
                 {
                     var createRequest = new CreateNoteRequest(data.Title, data.Content);
                     await notesClient.CreateNoteAsync(createRequest);
-                    snackbar.Add("Notatka utworzona", Severity.Success);
+                    snackbar.Add("Note created", Severity.Success);
                 }
                 await LoadNotes();
             }
             catch (Exception)
             {
-                snackbar.Add("Wystąpił błąd podczas zapisywania", Severity.Error);
+                snackbar.Add("Occur error while saving", Severity.Error);
             }
         }
     }
