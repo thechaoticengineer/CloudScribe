@@ -17,6 +17,17 @@ public static class ResultExtensions
             ? TypedResults.NoContent() 
             : MapFailure(result.Error!);
     }
+    
+    public static IResult ToCreated<T>(this Result<T> result, Func<T, string> uriBuilder)
+    {
+        if (result.IsSuccess)
+        {
+            var location = uriBuilder(result.Value!);
+            return Results.Created(location, result.Value);
+        }
+
+        return MapFailure(result.Error!);
+    }
 
     private static IResult MapFailure(Error error)
     {

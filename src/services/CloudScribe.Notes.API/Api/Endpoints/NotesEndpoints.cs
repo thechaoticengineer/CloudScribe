@@ -2,7 +2,6 @@ using CloudScribe.Contracts.Notes;
 using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Services;
 using CloudScribe.Notes.API.Validators;
-using Microsoft.AspNetCore.Http.HttpResults;
 using CloudScribe.SharedKernel;
 
 namespace CloudScribe.Notes.API.Api.Endpoints;
@@ -36,8 +35,8 @@ public static class NotesEndpoints
 
         group.MapPost("", async (CreateNoteRequest request, NotesService service) =>
             {
-                var note = await service.Create(request.Title, request.Content);
-                return Results.Created($"/api/notes/{note.Id}", note);
+                var result = await service.Create(request.Title, request.Content);
+                return result.ToCreated(note => $"/api/notes/{note.Id}");
             })
             .Produces<Note>(StatusCodes.Status201Created)
             .Produces(StatusCodes.Status400BadRequest)
@@ -45,13 +44,11 @@ public static class NotesEndpoints
             .WithDescription("Create a new note");
 
         group.MapPut("{id:guid}",
-                async Task<Results<Ok<Note>, NotFound, BadRequest>> (Guid id, UpdateNoteRequest request,
+                async (Guid id, UpdateNoteRequest request,
                     NotesService service) =>
                 {
-                    var note = await service.Update(id, request.Title, request.Content);
-                    return note is not null
-                        ? TypedResults.Ok(note)
-                        : TypedResults.NotFound();
+                    var result = await service.Update(id, request.Title, request.Content);
+                    return result.ToHttpResult();
                 })
             .Produces<Note>()
             .Produces(StatusCodes.Status404NotFound)
@@ -59,12 +56,10 @@ public static class NotesEndpoints
             .AddEndpointFilter<ValidationFilter<UpdateNoteRequest>>()
             .WithDescription("Update an existing note");
 
-        group.MapDelete("{id:guid}", async Task<Results<NoContent, NotFound>> (Guid id, NotesService service) =>
+        group.MapDelete("{id:guid}", async (Guid id, NotesService service) =>
             {
-                var deleted = await service.Delete(id);
-                return deleted
-                    ? TypedResults.NoContent()
-                    : TypedResults.NotFound();
+                var result = await service.Delete(id);
+                return result.ToHttpResult();
             }).Produces(StatusCodes.Status204NoContent)
             .Produces(StatusCodes.Status404NotFound)
             .WithDescription("Delete an existing note");

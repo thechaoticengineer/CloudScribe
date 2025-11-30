@@ -40,7 +40,7 @@ internal class NotesService
         return note ?? Result<Note>.Failure(Error.NotFound("Notes.NotFound", $"Note {id} doesn't exist"));
     }
 
-    public async Task<Note> Create(string title, string content)
+    public async Task<Result<Note>> Create(string title, string content)
     {
         var note = Note.Create(title, content);
         _db.Notes.Add(note);
@@ -48,25 +48,25 @@ internal class NotesService
         return note;
     }
 
-    public async Task<Note?> Update(Guid id, string title, string content)
+    public async Task<Result<Note>> Update(Guid id, string title, string content)
     {
         var note = await _db.Notes.FindAsync(id);
         if (note is null)
-            return null;
+            return Result<Note>.Failure(Error.NotFound("Notes.NotFound", $"Note {id} doesn't exist"));
 
         note.Update(title, content);
         await _db.SaveChangesAsync();
         return note;
     }
 
-    public async Task<bool> Delete(Guid id)
+    public async Task<Result> Delete(Guid id)
     {
         var note = await _db.Notes.FindAsync(id);
         if (note is null)
-            return false;
+            return Result.Failure(Error.NotFound("Notes.NotFound", $"Note {id} doesn't exist"));;
 
         _db.Notes.Remove(note);
         await _db.SaveChangesAsync();
-        return true;
+        return Result.Success();
     }
 }

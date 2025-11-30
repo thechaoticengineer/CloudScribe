@@ -1,6 +1,7 @@
 using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using CloudScribe.Notes.API.Services;
+using CloudScribe.SharedKernel;
 
 namespace CloudScribe.Notes.API.Tests.UnitTests;
 
@@ -13,7 +14,7 @@ public class NoteServiceTest
     private NotesService _service = null!;
     private Guid _noteReadId;
     private Guid _noteDeleteId;
-    
+
     [SetUp]
     public void Setup()
     {
@@ -31,35 +32,36 @@ public class NoteServiceTest
         _dbContext.SaveChanges();
         _service = new NotesService(_dbContext);
     }
-    
+
     [TestCase("test", "test")]
     [TestCase("test multi words", "test multi words")]
-    public async Task AddNote_ShouldReturnNoteWithTitleAndContent(string title, string content)
+    public async Task AddNote_ShouldReturnResultNoteWithTitleAndContent(string title, string content)
     {
         var result = await _service.Create(title, content);
-        
-        result.ShouldSatisfyAllConditions(() => result.ShouldNotBeNull(),
-            () => result.Title.ShouldBe(title),
-            () => result.Content.ShouldBe(content));
+
+        result.ShouldSatisfyAllConditions(
+            () => result.IsSuccess.ShouldBeTrue(),
+            () => result.Value!.Title.ShouldBe(title),
+            () => result.Value!.Content.ShouldBe(content));
     }
 
     [Test]
     public async Task AddNote_ShouldCreateWhenMaxTitleLengthIsReached()
     {
-        var result = await _service.Create("a".PadRight(Note.MaxTitleLength, 'a'),"test");
-        
-        result.ShouldSatisfyAllConditions(() => result.ShouldNotBeNull());
+        var result = await _service.Create("a".PadRight(Note.MaxTitleLength, 'a'), "test");
+
+        result.IsSuccess.ShouldBeTrue();
     }
-    
+
     [Test]
     public async Task AddNote_ShouldCreateWhenMaxContentLengthIsReached()
     {
-        var createdNote = await _service.Create("test", "a".PadRight(Note.MaxContentLength, 'a'));
-        createdNote.ShouldSatisfyAllConditions(
-            () => createdNote.ShouldNotBeNull(),
-            () => createdNote.Content.Length.ShouldBe(Note.MaxContentLength));
+        var result = await _service.Create("test", "a".PadRight(Note.MaxContentLength, 'a'));
+        result.ShouldSatisfyAllConditions(
+            () => result.IsSuccess.ShouldBeTrue(),
+            () => result.Value!.Content.Length.ShouldBe(Note.MaxContentLength));
     }
-    
+
     [TestCase(null)]
     [TestCase("")]
     [TestCase(" ")]
@@ -67,17 +69,17 @@ public class NoteServiceTest
     {
         Should.Throw<DomainException>(async () => await _service.Create(title!, "test"));
     }
-    
+
     [Test]
-    public void AddNote_ShouldReturnErrorWhenTitleIsTooLong() => 
+    public void AddNote_ShouldReturnErrorWhenTitleIsTooLong() =>
         Should.Throw<DomainException>(async () => await _service.Create("a".PadRight(Note.MaxTitleLength + 1, 'a'),
             "test"));
-    
+
     [Test]
-    public void AddNote_ShouldReturnErrorWhenContentIsTooLong() => 
+    public void AddNote_ShouldReturnErrorWhenContentIsTooLong() =>
         Should.Throw<DomainException>(async () => await _service.Create("test", "a".PadRight(Note.MaxContentLength + 1,
             'a')));
-    
+
     [TestCase(null)]
     [TestCase("")]
     [TestCase(" ")]
@@ -88,50 +90,54 @@ public class NoteServiceTest
     public async Task DeleteNote_ShouldDeleteNoteAndReturnTrue()
     {
         var result = await _service.Delete(_noteDeleteId);
-        
+
         result.ShouldSatisfyAllConditions(
-            () => result.ShouldBeTrue(),
+            () => result.IsSuccess.ShouldBeTrue(),
             () => _dbContext.Notes.Find(_noteDeleteId).ShouldBeNull());
     }
-    
+
     [Test]
-    public async Task DeleteNote_ShouldReturnFalseWhenNoteNotFound()
+    public async Task DeleteNote_ShouldReturnResultWithNotFoundError()
     {
         var result = await _service.Delete(Guid.NewGuid());
-        
-        result.ShouldBeFalse();
+        result.ShouldSatisfyAllConditions(
+            () => result.IsSuccess.ShouldBeFalse(),
+            () => result.Error!.Type.ShouldBe(ErrorType.NotFound));
     }
 
     [Test]
     public async Task GetNoteById_ShouldReturnNoteWhenFound()
     {
         var note = await _service.GetById(_noteReadId);
-        
-        note.IsSuccess.ShouldBeTrue();
-        note.Value!.Id.ShouldBe(_noteReadId);
+
+        note.ShouldSatisfyAllConditions(
+            () => note.IsSuccess.ShouldBeTrue(),
+            () => note.Value!.Id.ShouldBe(_noteReadId));
     }
-    
+
     [Test]
-    public async Task GetNoteById_ShouldReturnNullWhenNotFound()
+    public async Task GetNoteById_ShouldReturnNotFoundError()
     {
-        var note = await _service.GetById(Guid.NewGuid());
-        
-        note.ShouldBeNull();
+        var result = await _service.GetById(Guid.NewGuid());
+
+        result.ShouldSatisfyAllConditions(
+        () => result.IsSuccess.ShouldBeFalse(),
+        () => result.Error!.Type.ShouldBe(ErrorType.NotFound)
+            );
     }
 
     [Test]
     public async Task GetAllNotes_ShouldReturnAllNotes()
     {
         var notes = await _service.GetAll();
-        
+
         notes.IsSuccess.ShouldBeTrue();
         notes.Value!.Items.Count().ShouldBeGreaterThan(0);
     }
-    
+
     [TearDown]
     public async Task TearDown()
     {
         await _dbContext.DisposeAsync();
     }
-    
 }
