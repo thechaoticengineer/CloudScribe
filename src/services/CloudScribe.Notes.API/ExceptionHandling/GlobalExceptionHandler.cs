@@ -14,14 +14,24 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         {
             Status = StatusCodes.Status500InternalServerError,
             Title = "Internal Server Error",
-            Detail = "An unexpected error occurred on the server."
+            Detail = "An unexpected error occurred on the server.",
+            Instance = httpContext.Request.Path
         };
-
-        if (exception is DomainException domainException)
+        
+        switch (exception)
         {
-            problemDetails.Status = StatusCodes.Status400BadRequest;
-            problemDetails.Title = "Bad Request";
-            problemDetails.Detail = domainException.Message;
+            // 1. Błędy Domenowe (Biznesowe) -> Logujemy jako WARNING (nie zaśmiecamy błędów)
+            case DomainException domainEx:
+                logger.LogWarning(domainEx, "Domain error: {Message}", domainEx.Message);
+                
+                problemDetails.Status = StatusCodes.Status400BadRequest;
+                problemDetails.Title = "Bad request";
+                problemDetails.Detail = domainEx.Message;
+                break;
+
+            default:
+                logger.LogError(exception, "Critical error: {Message}", exception.Message);
+                break;
         }
         
         httpContext.Response.StatusCode = problemDetails.Status.Value;

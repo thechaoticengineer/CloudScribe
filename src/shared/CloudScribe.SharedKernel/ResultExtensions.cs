@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CloudScribe.SharedKernel;
 
@@ -31,18 +32,46 @@ public static class ResultExtensions
 
     private static IResult MapFailure(Error error)
     {
+        var problem = CreateProblemDetails(
+            GetTitle(error.Type), 
+            GetStatusCode(error.Type), 
+            error);
+
         return error.Type switch
         {
-            ErrorType.NotFound => TypedResults.NotFound(CreateProblem(error)),
-            ErrorType.Validation => TypedResults.BadRequest(CreateProblem(error)),
-            ErrorType.Conflict => TypedResults.Conflict(CreateProblem(error)),
-            _ => TypedResults.InternalServerError(CreateProblem(error))
+            ErrorType.Validation => TypedResults.BadRequest(problem),
+            ErrorType.NotFound   => TypedResults.NotFound(problem),
+            ErrorType.Conflict   => TypedResults.Conflict(problem),
+            _ => TypedResults.Problem(problem)
         };
     }
 
-    private static object CreateProblem(Error error) => new 
-    { 
-        Status = error.Code, 
-        Detail = error.Message 
+    private static int GetStatusCode(ErrorType type) => type switch
+    {
+        ErrorType.Validation => StatusCodes.Status400BadRequest,
+        ErrorType.NotFound   => StatusCodes.Status404NotFound,
+        ErrorType.Conflict   => StatusCodes.Status409Conflict,
+        ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+        _ => StatusCodes.Status500InternalServerError
     };
+
+    private static string GetTitle(ErrorType type) => type switch
+    {
+        ErrorType.Validation => "Bad Request",
+        ErrorType.NotFound   => "Not Found",
+        ErrorType.Conflict   => "Conflict",
+        ErrorType.Unauthorized => "Unauthorized",
+        _ => "Internal Server Error"
+    };
+
+    private static ProblemDetails CreateProblemDetails(string title, int status, Error error)
+    {
+        return new ProblemDetails
+        {
+            Title = title,
+            Status = status,
+            Detail = error.Message,
+            Extensions = { { "code", error.Code } }
+        };
+    }
 }
