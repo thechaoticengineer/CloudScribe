@@ -16,17 +16,19 @@ public static class NotesEndpoints
             .WithOpenApi()
             .RequireAuthorization();
 
-        group.MapGet("", async (NotesService service, int pageNumber = 1, int pageSize = 10) =>
-                Results.Ok(await service.GetAll(pageNumber, pageSize)))
+        group.MapGet("",
+                async (NotesService service, int pageNumber = 1, int pageSize = 10) =>
+                {
+                    var result = await service.GetAll(pageNumber, pageSize);
+                    return result.ToHttpResult();
+                })
             .Produces<PagedResult<Note>>()
             .WithDescription("Get all notes ordered by created date descending");
 
-        group.MapGet("{id:guid}", async Task<Results<Ok<Note>, NotFound>> (Guid id, NotesService service) =>
+        group.MapGet("{id:guid}", async (Guid id, NotesService service) =>
             {
                 var note = await service.GetById(id);
-                return note is not null
-                    ? TypedResults.Ok(note)
-                    : TypedResults.NotFound();
+                return note.ToHttpResult();
             })
             .Produces<Note>()
             .Produces(StatusCodes.Status404NotFound)
@@ -43,7 +45,8 @@ public static class NotesEndpoints
             .WithDescription("Create a new note");
 
         group.MapPut("{id:guid}",
-                async Task<Results<Ok<Note>, NotFound, BadRequest>> (Guid id, UpdateNoteRequest request, NotesService service) =>
+                async Task<Results<Ok<Note>, NotFound, BadRequest>> (Guid id, UpdateNoteRequest request,
+                    NotesService service) =>
                 {
                     var note = await service.Update(id, request.Title, request.Content);
                     return note is not null

@@ -14,7 +14,7 @@ internal class NotesService
         _db = db;
     }
 
-    public async Task<PagedResult<Note>> GetAll(int pageNumber = 1, int pageSize = 10)
+    public async Task<Result<PagedResult<Note>>> GetAll(int pageNumber = 1, int pageSize = 10)
     {
         var totalCount = await _db.Notes.CountAsync();
 
@@ -23,7 +23,8 @@ internal class NotesService
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize)
             .ToListAsync();
-
+        
+        
         return new PagedResult<Note>
         {
             Items = items,
@@ -33,9 +34,10 @@ internal class NotesService
         };
     }
 
-    public async Task<Note?> GetById(Guid id)
+    public async Task<Result<Note>> GetById(Guid id)
     {
-        return await _db.Notes.FindAsync(id);
+        var note = await _db.Notes.FindAsync(id);
+        return note ?? Result<Note>.Failure(Error.NotFound("Notes.NotFound", $"Note {id} doesn't exist"));
     }
 
     public async Task<Note> Create(string title, string content)

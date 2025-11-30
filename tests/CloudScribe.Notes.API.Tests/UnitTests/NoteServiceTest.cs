@@ -84,6 +84,7 @@ public class NoteServiceTest
     public void AddNote_ShouldReturnErrorWhenContentIsEmpty(string? content) =>
         Should.Throw<DomainException>(async () => await _service.Create("test", content!));
 
+    [Test]
     public async Task DeleteNote_ShouldDeleteNoteAndReturnTrue()
     {
         var result = await _service.Delete(_noteDeleteId);
@@ -105,9 +106,9 @@ public class NoteServiceTest
     public async Task GetNoteById_ShouldReturnNoteWhenFound()
     {
         var note = await _service.GetById(_noteReadId);
-
-        note.ShouldNotBeNull();
-        note!.Id.ShouldBe(_noteReadId);
+        
+        note.IsSuccess.ShouldBeTrue();
+        note.Value!.Id.ShouldBe(_noteReadId);
     }
     
     [Test]
@@ -122,8 +123,9 @@ public class NoteServiceTest
     public async Task GetAllNotes_ShouldReturnAllNotes()
     {
         var notes = await _service.GetAll();
-        notes.ShouldNotBeNull();
-        notes.Items.Count().ShouldBeGreaterThan(0);
+        
+        notes.IsSuccess.ShouldBeTrue();
+        notes.Value!.Items.Count().ShouldBeGreaterThan(0);
     }
     
     [TearDown]
