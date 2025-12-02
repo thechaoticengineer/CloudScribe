@@ -20,7 +20,6 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         
         switch (exception)
         {
-            // 1. Błędy Domenowe (Biznesowe) -> Logujemy jako WARNING (nie zaśmiecamy błędów)
             case DomainException domainEx:
                 logger.LogWarning(domainEx, "Domain error: {Message}", domainEx.Message);
                 

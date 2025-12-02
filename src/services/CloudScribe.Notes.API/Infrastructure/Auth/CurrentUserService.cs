@@ -22,7 +22,7 @@ public class CurrentUserService(IHttpContextAccessor httpContextAccessor) : ICur
 
             if (string.IsNullOrEmpty(idClaim) || !Guid.TryParse(idClaim, out var userId))
             {
-                throw new UnauthorizedAccessException("Brak kontekstu użytkownika.");
+                throw new UnauthorizedAccessException("User context is missing.");
             }
 
             _cachedId = userId;

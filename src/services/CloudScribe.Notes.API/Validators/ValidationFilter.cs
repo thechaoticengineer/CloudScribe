@@ -20,7 +20,7 @@ public class ValidationFilter<T> : IEndpointFilter where T : class?
 
         if (argToValidate is null)
         {
-            return Results.BadRequest("Nie można odnaleźć obiektu do walidacji.");
+            return Results.BadRequest("Cannot find object to validate.");
         }
 
         ValidationResult validationResult = await _validator.ValidateAsync(argToValidate);
