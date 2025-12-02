@@ -17,8 +17,11 @@ public class NoteServiceTest
     private NotesService _service = null!;
     private ICurrentUser _currentUser = null!;
     private Guid _testUserId;
+    private Guid _otherUserId;
     private Guid _noteReadId;
     private Guid _noteDeleteId;
+    private Guid _otherUserNoteId;
+    private Guid _noteToEditId;
 
     [SetUp]
     public void Setup()
@@ -29,6 +32,7 @@ public class NoteServiceTest
 
         _dbContext = new CloudScribeDbContext(options);
         _testUserId = Guid.Parse(TestConst.TestUserId);
+        _otherUserId = Guid.Parse(TestConst.OtherUserId);
 
         _currentUser = Substitute.For<ICurrentUser>();
         _currentUser.Id.Returns(_testUserId);
@@ -36,9 +40,17 @@ public class NoteServiceTest
         var note = Note.Create("test", "test", _testUserId);
         _noteReadId = note.Id;
         _dbContext.Notes.Add(note);
+        var noteToEdit = Note.Create("test", "test", _testUserId);
+        _noteToEditId = noteToEdit.Id;
+        _dbContext.Notes.Add(noteToEdit);
         var noteToDelete = Note.Create("test delete", "test delete", _testUserId);
         _noteDeleteId = noteToDelete.Id;
         _dbContext.Notes.Add(noteToDelete);
+
+        var otherUserNote = Note.Create("other user note", "other user content", _otherUserId);
+        _otherUserNoteId = otherUserNote.Id;
+        _dbContext.Notes.Add(otherUserNote);
+
         _dbContext.SaveChanges();
         _service = new NotesService(_dbContext, _currentUser);
     }
@@ -116,6 +128,17 @@ public class NoteServiceTest
     }
 
     [Test]
+    public async Task DeleteNote_ShouldReturnForbiddenError_WhenUserIsNotOwner()
+    {
+        var result = await _service.Delete(_otherUserNoteId);
+
+        result.ShouldSatisfyAllConditions(
+            () => result.IsSuccess.ShouldBeFalse(),
+            () => result.Error!.Type.ShouldBe(ErrorType.Forbidden),
+            () => result.Error!.Code.ShouldBe("Notes.Forbidden"));
+    }
+
+    [Test]
     public async Task GetNoteById_ShouldReturnNoteWhenFound()
     {
         var note = await _service.GetById(_noteReadId);
@@ -137,12 +160,55 @@ public class NoteServiceTest
     }
 
     [Test]
+    public async Task GetNoteById_ShouldReturnForbiddenError_WhenUserIsNotOwner()
+    {
+        var result = await _service.GetById(_otherUserNoteId);
+
+        result.ShouldSatisfyAllConditions(
+            () => result.IsSuccess.ShouldBeFalse(),
+            () => result.Error!.Type.ShouldBe(ErrorType.Forbidden),
+            () => result.Error!.Code.ShouldBe("Notes.Forbidden"));
+    }
+
+    [Test]
     public async Task GetAllNotes_ShouldReturnAllNotes()
     {
         var notes = await _service.GetAll();
 
         notes.IsSuccess.ShouldBeTrue();
         notes.Value!.Items.Count().ShouldBeGreaterThan(0);
+    }
+
+    [Test]
+    public async Task UpdateNote_ShouldUpdateNoteSuccessfully()
+    {
+        var result = await _service.Update(_noteToEditId, "updated title", "updated content");
+
+        result.ShouldSatisfyAllConditions(
+            () => result.IsSuccess.ShouldBeTrue(),
+            () => result.Value!.Title.ShouldBe("updated title"),
+            () => result.Value!.Content.ShouldBe("updated content"));
+    }
+
+    [Test]
+    public async Task UpdateNote_ShouldReturnNotFoundError_WhenNoteDoesNotExist()
+    {
+        var result = await _service.Update(Guid.NewGuid(), "title", "content");
+
+        result.ShouldSatisfyAllConditions(
+            () => result.IsSuccess.ShouldBeFalse(),
+            () => result.Error!.Type.ShouldBe(ErrorType.NotFound));
+    }
+
+    [Test]
+    public async Task UpdateNote_ShouldReturnForbiddenError_WhenUserIsNotOwner()
+    {
+        var result = await _service.Update(_otherUserNoteId, "updated title", "updated content");
+
+        result.ShouldSatisfyAllConditions(
+            () => result.IsSuccess.ShouldBeFalse(),
+            () => result.Error!.Type.ShouldBe(ErrorType.Forbidden),
+            () => result.Error!.Code.ShouldBe("Notes.Forbidden"));
     }
 
     [TearDown]
