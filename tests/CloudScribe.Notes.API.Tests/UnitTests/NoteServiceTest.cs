@@ -1,7 +1,9 @@
 using CloudScribe.Notes.API.Domain;
+using CloudScribe.Notes.API.Infrastructure.Auth;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using CloudScribe.Notes.API.Services;
 using CloudScribe.SharedKernel;
+using NSubstitute;
 
 namespace CloudScribe.Notes.API.Tests.UnitTests;
 
@@ -12,6 +14,8 @@ public class NoteServiceTest
 {
     private CloudScribeDbContext _dbContext;
     private NotesService _service = null!;
+    private ICurrentUser _currentUser = null!;
+    private Guid _testUserId;
     private Guid _noteReadId;
     private Guid _noteDeleteId;
 
@@ -23,14 +27,19 @@ public class NoteServiceTest
             .Options;
 
         _dbContext = new CloudScribeDbContext(options);
-        var note = Note.Create("test", "test");
+        _testUserId = Guid.Parse("d97167d6-8d75-4fda-9e56-eab360eeb955");
+
+        _currentUser = Substitute.For<ICurrentUser>();
+        _currentUser.Id.Returns(_testUserId);
+
+        var note = Note.Create("test", "test", _testUserId);
         _noteReadId = note.Id;
         _dbContext.Notes.Add(note);
-        var noteToDelete = Note.Create("test delete", "test delete");
+        var noteToDelete = Note.Create("test delete", "test delete", _testUserId);
         _noteDeleteId = noteToDelete.Id;
         _dbContext.Notes.Add(noteToDelete);
         _dbContext.SaveChanges();
-        _service = new NotesService(_dbContext);
+        _service = new NotesService(_dbContext, _currentUser);
     }
 
     [TestCase("test", "test")]

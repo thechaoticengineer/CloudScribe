@@ -42,15 +42,15 @@ public abstract class BaseIntegrationTest
         _scope.Dispose();
     }
 
-    protected async Task<Note> CreateNoteAndSave(string title, string content)
+    protected async Task<Note> CreateNoteAndSave(string title, string content, string userId = TestConst.TestUserId)
     {
-        var note = Note.Create(title, content);
+        var note = Note.Create(title, content, Guid.Parse(userId));
         DbContext.Notes.Add(note);
         await DbContext.SaveChangesAsync();
         return note;
     }
     
-    protected void AuthenticateAsync(string userId = "test-user-id")
+    protected void AuthenticateAsync(string userId = TestConst.TestUserId)
     {
         var token = TestAuthHandler.GenerateJwtToken(userId);
         Client.DefaultRequestHeaders.Authorization = 

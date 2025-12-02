@@ -10,7 +10,7 @@ public class TestAuthHandler
     public const string Issuer = "integration-tests";
     public const string TestSecretKey = "super-secret-key-for-integration-tests-only!!";
     
-    public static string GenerateJwtToken(string userId = "test-user-id")
+    public static string GenerateJwtToken(string userId = TestConst.TestUserId)
     {
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(TestSecretKey));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);

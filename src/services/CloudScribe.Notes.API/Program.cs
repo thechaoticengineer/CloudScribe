@@ -1,6 +1,7 @@
 using CloudScribe.Notes.API.Api.Endpoints;
 using CloudScribe.Notes.API.ExceptionHandling;
 using CloudScribe.Notes.API.Extensions;
+using CloudScribe.Notes.API.Infrastructure.Auth;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using CloudScribe.Notes.API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -38,7 +39,9 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<NotesService>();
+builder.Services.AddScoped<ICurrentUser, CurrentUserService>();
 
 builder.Services.AddProblemDetails();
 builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
@@ -64,6 +67,9 @@ if (app.Environment.IsDevelopment())
     app.ApplyMigrations();
     app.MapOpenApi();
 }
+
+app.UseAuthentication();
+app.UseAuthorization();
 
 app.MapNotesEndpoints();
 app.UseHttpsRedirection();

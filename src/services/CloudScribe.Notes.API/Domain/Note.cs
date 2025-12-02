@@ -11,12 +11,12 @@ public sealed class Note
     public string Content { get; private set; } = string.Empty;
     public DateTime CreatedUtc { get; }
     public DateTime ModifiedUtc { get; private set; }
-    // UserID will be added later
+    public Guid OwnerId { get; private set; }
     
     [UsedImplicitly]
     private Note() { }
 
-    private Note(string title, string content)
+    private Note(string title, string content, Guid ownerId)
     {
         Id = Guid.CreateVersion7();
         ValidateTitle(title);
@@ -25,11 +25,13 @@ public sealed class Note
         Content = content;
         CreatedUtc = DateTime.UtcNow;
         ModifiedUtc = DateTime.UtcNow;
+        if (ownerId == Guid.Empty) throw new DomainException("OwnerId is required");
+        OwnerId = ownerId;
     }
 
-    public static Note Create(string title, string content)
+    public static Note Create(string title, string content, Guid ownerId)
     {
-        return new Note(title, content);
+        return new Note(title, content, ownerId);
     }
 
     public Note Update(string title, string content)

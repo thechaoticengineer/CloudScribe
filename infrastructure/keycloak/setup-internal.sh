@@ -33,4 +33,9 @@ if ! $KCADM get users -r cloudscribe -q username=testuser | grep "testuser" > /d
     $KCADM set-password -r cloudscribe --username testuser --new-password test
 fi
 
+if ! $KCADM get users -r cloudscribe -q username=testuser | grep "testuser2" > /dev/null; then
+    $KCADM create users -r cloudscribe -s username=testuser2 -s enabled=true
+    $KCADM set-password -r cloudscribe --username testuser2 --new-password test
+fi
+
 echo "CONFIGURATION FINISHED"
