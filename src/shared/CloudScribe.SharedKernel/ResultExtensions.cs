@@ -33,8 +33,8 @@ public static class ResultExtensions
     private static IResult MapFailure(Error error)
     {
         var problem = CreateProblemDetails(
-            GetTitle(error.Type), 
-            GetStatusCode(error.Type), 
+            GetTitle(error.Type),
+            GetStatusCode(error.Type),
             error);
 
         return error.Type switch
@@ -52,6 +52,7 @@ public static class ResultExtensions
         ErrorType.NotFound   => StatusCodes.Status404NotFound,
         ErrorType.Conflict   => StatusCodes.Status409Conflict,
         ErrorType.Unauthorized => StatusCodes.Status401Unauthorized,
+        ErrorType.Forbidden => StatusCodes.Status403Forbidden,
         _ => StatusCodes.Status500InternalServerError
     };
 
@@ -61,6 +62,7 @@ public static class ResultExtensions
         ErrorType.NotFound   => "Not Found",
         ErrorType.Conflict   => "Conflict",
         ErrorType.Unauthorized => "Unauthorized",
+        ErrorType.Forbidden => "Forbidden",
         _ => "Internal Server Error"
     };
 

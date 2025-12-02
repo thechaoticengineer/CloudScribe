@@ -2,6 +2,7 @@ using CloudScribe.Notes.API.Domain;
 using CloudScribe.Notes.API.Infrastructure.Auth;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using CloudScribe.Notes.API.Services;
+using CloudScribe.Notes.API.Tests.Helpers;
 using CloudScribe.SharedKernel;
 using NSubstitute;
 
@@ -27,7 +28,7 @@ public class NoteServiceTest
             .Options;
 
         _dbContext = new CloudScribeDbContext(options);
-        _testUserId = Guid.Parse("d97167d6-8d75-4fda-9e56-eab360eeb955");
+        _testUserId = Guid.Parse(TestConst.TestUserId);
 
         _currentUser = Substitute.For<ICurrentUser>();
         _currentUser.Id.Returns(_testUserId);

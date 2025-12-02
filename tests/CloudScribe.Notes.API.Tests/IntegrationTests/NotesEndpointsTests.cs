@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using CloudScribe.Contracts.Notes;
 using CloudScribe.Notes.API.Domain;
+using CloudScribe.Notes.API.Tests.Helpers;
 using CloudScribe.SharedKernel;
 
 namespace CloudScribe.Notes.API.Tests.IntegrationTests;
@@ -98,8 +99,19 @@ public class NotesEndpointsTests : BaseIntegrationTest
         var nonExistentId = Guid.NewGuid();
 
         var response = await Client.GetAsync($"/api/notes/{nonExistentId}");
-        
+
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Test]
+    public async Task GetNoteById_ReturnsForbidden_WhenUserIsNotOwner()
+    {
+        AuthenticateAsync();
+        var otherUserNote = await CreateNoteAndSave("Other User's Note", "Other User's Content", TestConst.OtherUserId);
+
+        var response = await Client.GetAsync($"/api/notes/{otherUserNote.Id}");
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
 
     [Test]
@@ -145,6 +157,18 @@ public class NotesEndpointsTests : BaseIntegrationTest
     }
 
     [Test]
+    public async Task UpdateNote_ReturnsForbidden_WhenUserIsNotOwner()
+    {
+        AuthenticateAsync();
+        var otherUserNote = await CreateNoteAndSave("Other User's Note", "Other User's Content", TestConst.OtherUserId);
+        var updateRequest = new UpdateNoteRequest("Updated Title", "Updated Content");
+
+        var response = await Client.PutAsJsonAsync($"/api/notes/{otherUserNote.Id}", updateRequest);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
+    [Test]
     public async Task DeleteNote_ReturnsNoContent_WhenNoteExists()
     {
         AuthenticateAsync();
@@ -166,6 +190,17 @@ public class NotesEndpointsTests : BaseIntegrationTest
         var response = await Client.DeleteAsync($"/api/notes/{nonExistentId}");
 
         response.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Test]
+    public async Task DeleteNote_ReturnsForbidden_WhenUserIsNotOwner()
+    {
+        AuthenticateAsync();
+        var otherUserNote = await CreateNoteAndSave("Other User's Note", "Other User's Content", TestConst.OtherUserId);
+
+        var response = await Client.DeleteAsync($"/api/notes/{otherUserNote.Id}");
+
+        response.StatusCode.ShouldBe(HttpStatusCode.Forbidden);
     }
 
     [Test]
