@@ -35,8 +35,14 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("profile");
         options.Scope.Add("email");
         options.Scope.Add("offline_access");
-        
+
         options.TokenValidationParameters.NameClaimType = "preferred_username";
+        options.TokenValidationParameters.ValidIssuers = new[]
+        {
+            "http://keycloak-service:8080/realms/cloudscribe",
+            "http://localhost:8080/realms/cloudscribe",
+            "http://localhost:8180/realms/cloudscribe"
+        };
         options.Events = new OpenIdConnectEvents
         {
             OnTokenValidated = context =>
