@@ -47,6 +47,13 @@ builder.Services.AddAuthentication(options =>
                 identity.AddClaim(new System.Security.Claims.Claim("access_token", accessToken));
             
                 return Task.CompletedTask;
+            },
+            OnRedirectToIdentityProvider = context =>
+            {
+                context.ProtocolMessage.IssuerAddress = context.ProtocolMessage.IssuerAddress
+                    .Replace("keycloak-service", "localhost");
+                
+                return Task.CompletedTask;
             }
         };
     });
