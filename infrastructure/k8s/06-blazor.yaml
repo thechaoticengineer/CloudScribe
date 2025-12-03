@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudscribe-blazor
+  namespace: cloudscribe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudscribe-blazor
+  template:
+    metadata:
+      labels:
+        app: cloudscribe-blazor
+    spec:
+      containers:
+        - name: blazor
+          image: ghcr.io/thechaoticengineer/cloudscribe-blazor:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Development"
+            - name: ApiUrl
+              value: "http://cloudscribe-api-service"
+            - name: Oidc__Authority
+              value: "http://keycloak-service:8080/realms/cloudscribe"
+            - name: Oidc__MetadataAddress
+              value: "http://keycloak-service:8080/realms/cloudscribe/.well-known/openid-configuration"
+            - name: Oidc__ClientId
+              value: "cloudscribe-web"
+            - name: Oidc__ClientSecret
+              valueFrom:
+                secretKeyRef:
+                  name: cloudscribe-secrets
+                  key: oidc-client-secret
+            - name: Oidc__RequireHttpsMetadata
+              value: "false"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudscribe-blazor-service
+  namespace: cloudscribe
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: cloudscribe-blazor
+  type: LoadBalancer
