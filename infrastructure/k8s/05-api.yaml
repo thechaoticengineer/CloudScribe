@@ -20,13 +20,13 @@ spec:
           ports:
             - containerPort: 8080
           env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Development"
             - name: ConnectionStrings__DefaultConnection
-              value: "Host=postgres-service;Database=cloudscribe;Username=postgres;Password=$(POSTGRES_PASSWORD)"
-            - name: POSTGRES_PASSWORD
               valueFrom:
                 secretKeyRef:
                   name: cloudscribe-secrets
-                  key: postgres-password
+                  key: postgres-connection-string
             
             - name: Authentication__Authority
               value: "http://keycloak-service:8080/realms/cloudscribe"

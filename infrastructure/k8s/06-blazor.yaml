@@ -21,7 +21,7 @@ spec:
             - containerPort: 8080
           env:
             - name: ASPNETCORE_ENVIRONMENT
-              value: "Development"
+              value: "Production"
             - name: ApiUrl
               value: "http://cloudscribe-api-service"
             - name: Oidc__Authority

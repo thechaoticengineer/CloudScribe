@@ -30,7 +30,7 @@ data:
           -s secret=$OIDC_CLIENT_SECRET \
           -s enabled=true \
           -s clientAuthenticatorType=client-secret \
-          -s "redirectUris=[\"https://localhost:7234/signin-oidc\", \"http://localhost:5000/signin-oidc\"]" \
+          -s "redirectUris=[\"https://localhost:7234/signin-oidc\", \"http://localhost:7234/signin-oidc\", \"http://localhost:5000/signin-oidc\"]" \
           -s "webOrigins=[\"+\"]" \
           -s publicClient=false \
           -s serviceAccountsEnabled=true \
