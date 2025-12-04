@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(options =>
         var clientSecret = keycloakSettings["ClientSecret"]!;
 
         options.Authority = $"{publicAddress}/realms/{realm}";
-        options.MetadataAddress = $"{publicAddress}/realms/{realm}/.well-known/openid-configuration";
+        options.MetadataAddress = $"{internalAddress}/realms/{realm}/.well-known/openid-configuration";
         options.ClientId = clientId;
         options.ClientSecret = clientSecret;
         options.ResponseType = "code";
