@@ -46,7 +46,7 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("offline_access");
 
         options.TokenValidationParameters.NameClaimType = "preferred_username";
-        options.TokenValidationParameters.ValidIssuer = $"{internalAddress}/realms/{realm}";
+        options.TokenValidationParameters.ValidIssuer = $"{publicAddress}/realms/{realm}";
 
         options.Events = new OpenIdConnectEvents
         {
