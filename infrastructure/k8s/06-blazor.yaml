@@ -21,22 +21,22 @@ spec:
             - containerPort: 8080
           env:
             - name: ASPNETCORE_ENVIRONMENT
-              value: "Production"
+              value: "Development"
             - name: ApiUrl
               value: "http://cloudscribe-api-service"
-            - name: Oidc__Authority
-              value: "http://keycloak-service:8080/realms/cloudscribe"
-            - name: Oidc__MetadataAddress
-              value: "http://keycloak-service:8080/realms/cloudscribe/.well-known/openid-configuration"
-            - name: Oidc__ClientId
+            - name: Keycloak__PublicAddress
+              value: "http://localhost:8080"
+            - name: Keycloak__InternalAddress
+              value: "http://keycloak-service:8080"
+            - name: Keycloak__Realm
+              value: "cloudscribe"
+            - name: Keycloak__ClientId
               value: "cloudscribe-web"
-            - name: Oidc__ClientSecret
+            - name: Keycloak__ClientSecret
               valueFrom:
                 secretKeyRef:
                   name: cloudscribe-secrets
                   key: oidc-client-secret
-            - name: Oidc__RequireHttpsMetadata
-              value: "false"
 
 ---
 apiVersion: v1

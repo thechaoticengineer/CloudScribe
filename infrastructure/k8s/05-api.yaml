@@ -27,13 +27,13 @@ spec:
                 secretKeyRef:
                   name: cloudscribe-secrets
                   key: postgres-connection-string
-            
-            - name: Authentication__Authority
-              value: "http://keycloak-service:8080/realms/cloudscribe"
-            - name: Authentication__MetadataAddress
-              value: "http://keycloak-service:8080/realms/cloudscribe/.well-known/openid-configuration"
-            - name: Authentication__RequireHttpsMetadata
-              value: "false"
+
+            - name: Keycloak__PublicAddress
+              value: "http://localhost:8080"
+            - name: Keycloak__InternalAddress
+              value: "http://keycloak-service:8080"
+            - name: Keycloak__Realm
+              value: "cloudscribe"
 
 ---
 apiVersion: v1
