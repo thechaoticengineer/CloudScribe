@@ -24,41 +24,38 @@ builder.Services.AddAuthentication(options =>
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
-        options.Authority = builder.Configuration["Oidc:Authority"];
-        options.ClientId = builder.Configuration["Oidc:ClientId"];
-        options.ClientSecret = builder.Configuration["Oidc:ClientSecret"];
+        var keycloakSettings = builder.Configuration.GetSection("Keycloak");
+
+        var publicAddress = keycloakSettings["PublicAddress"]!;
+        var internalAddress = keycloakSettings["InternalAddress"]!;
+        var realm = keycloakSettings["Realm"]!;
+        var clientId = keycloakSettings["ClientId"]!;
+        var clientSecret = keycloakSettings["ClientSecret"]!;
+
+        options.Authority = $"{publicAddress}/realms/{realm}";
+        options.ClientId = clientId;
+        options.ClientSecret = clientSecret;
         options.ResponseType = "code";
         options.RequireHttpsMetadata = false;
         options.SaveTokens = true;
-        
+
         options.Scope.Add("openid");
         options.Scope.Add("profile");
         options.Scope.Add("email");
         options.Scope.Add("offline_access");
 
         options.TokenValidationParameters.NameClaimType = "preferred_username";
-        options.TokenValidationParameters.ValidIssuers = new[]
-        {
-            "http://keycloak-service:8080/realms/cloudscribe",
-            "http://localhost:8080/realms/cloudscribe",
-            "http://localhost:8180/realms/cloudscribe"
-        };
+        options.TokenValidationParameters.ValidIssuer = $"{internalAddress}/realms/{realm}";
+
         options.Events = new OpenIdConnectEvents
         {
             OnTokenValidated = context =>
             {
                 var accessToken = context.SecurityToken.RawData;
-                
+
                 var identity = (System.Security.Claims.ClaimsIdentity)context.Principal!.Identity!;
                 identity.AddClaim(new System.Security.Claims.Claim("access_token", accessToken));
-            
-                return Task.CompletedTask;
-            },
-            OnRedirectToIdentityProvider = context =>
-            {
-                context.ProtocolMessage.IssuerAddress = context.ProtocolMessage.IssuerAddress
-                    .Replace("keycloak-service", "localhost");
-                
+
                 return Task.CompletedTask;
             }
         };

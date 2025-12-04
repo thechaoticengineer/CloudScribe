@@ -23,22 +23,25 @@ builder.Services.AddDbContext<CloudScribeDbContext>(options =>
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
-        var authSettings = builder.Configuration.GetSection("Authentication");
-        
-        options.Authority = authSettings["Authority"];
-        options.MetadataAddress = authSettings["MetadataAddress"]!;
-        options.RequireHttpsMetadata = bool.Parse(authSettings["RequireHttpsMetadata"]!);
-        
+        var keycloakSettings = builder.Configuration.GetSection("Keycloak");
+
+        var publicAddress = keycloakSettings["PublicAddress"]!;
+        var internalAddress = keycloakSettings["InternalAddress"]!;
+        var realm = keycloakSettings["Realm"]!;
+
+        var authority = $"{publicAddress}/realms/{realm}";
+        var metadataAddress = $"{internalAddress}/realms/{realm}/.well-known/openid-configuration";
+        var issuer = $"{internalAddress}/realms/{realm}";
+
+        options.Authority = authority;
+        options.MetadataAddress = metadataAddress;
+        options.RequireHttpsMetadata = false;
+
         options.TokenValidationParameters = new TokenValidationParameters
         {
             ValidateAudience = false,
             ValidateIssuer = true,
-            ValidIssuers = new[]
-            {
-                "http://keycloak-service:8080/realms/cloudscribe",
-                "http://localhost:8080/realms/cloudscribe",
-                "http://localhost:8180/realms/cloudscribe"
-            },
+            ValidIssuer = issuer,
             ValidateLifetime = true
         };
     });
@@ -66,7 +69,6 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.ApplyMigrations();
