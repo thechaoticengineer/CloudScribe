@@ -32,7 +32,7 @@ builder.Services.AddAuthentication(options =>
         var clientId = keycloakSettings["ClientId"]!;
         var clientSecret = keycloakSettings["ClientSecret"]!;
 
-        options.Authority = $"{publicAddress}/realms/{realm}";
+        options.Authority = $"{internalAddress}/realms/{realm}";
         options.MetadataAddress = $"{internalAddress}/realms/{realm}/.well-known/openid-configuration";
         options.ClientId = clientId;
         options.ClientSecret = clientSecret;
@@ -46,7 +46,7 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("offline_access");
 
         options.TokenValidationParameters.NameClaimType = "preferred_username";
-        options.TokenValidationParameters.ValidIssuer = $"{publicAddress}/realms/{realm}";
+        options.TokenValidationParameters.ValidIssuer = $"{internalAddress}/realms/{realm}";
 
         options.Events = new OpenIdConnectEvents
         {
@@ -56,6 +56,17 @@ builder.Services.AddAuthentication(options =>
 
                 var identity = (System.Security.Claims.ClaimsIdentity)context.Principal!.Identity!;
                 identity.AddClaim(new System.Security.Claims.Claim("access_token", accessToken));
+
+                return Task.CompletedTask;
+            },
+            OnRedirectToIdentityProvider = context =>
+            {
+                // Replace internal Keycloak address with public address for browser redirects
+                var internalHost = new Uri(internalAddress).Authority;
+                var publicHost = new Uri(publicAddress).Authority;
+
+                context.ProtocolMessage.IssuerAddress = context.ProtocolMessage.IssuerAddress?
+                    .Replace(internalHost, publicHost);
 
                 return Task.CompletedTask;
             }
