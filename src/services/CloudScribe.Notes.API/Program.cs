@@ -24,12 +24,13 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
         var keycloakSettings = builder.Configuration.GetSection("Keycloak");
-        
+
+        var publicAddress = keycloakSettings["PublicAddress"]!;
         var internalAddress = keycloakSettings["InternalAddress"]!;
         var realm = keycloakSettings["Realm"]!;
 
         var metadataAddress = $"{internalAddress}/realms/{realm}/.well-known/openid-configuration";
-        var issuer = $"{internalAddress}/realms/{realm}";
+        var issuer = $"{publicAddress}/realms/{realm}";
 
         options.MetadataAddress = metadataAddress;
         options.RequireHttpsMetadata = false;
