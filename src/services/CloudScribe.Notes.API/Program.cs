@@ -30,8 +30,8 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         var realm = keycloakSettings["Realm"]!;
 
         var authority = $"{publicAddress}/realms/{realm}";
-        var metadataAddress = $"{internalAddress}/realms/{realm}/.well-known/openid-configuration";
-        var issuer = $"{internalAddress}/realms/{realm}";
+        var metadataAddress = $"{publicAddress}/realms/{realm}/.well-known/openid-configuration";
+        var issuer = $"{publicAddress}/realms/{realm}";
 
         options.Authority = authority;
         options.MetadataAddress = metadataAddress;

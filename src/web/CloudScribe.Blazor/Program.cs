@@ -33,7 +33,7 @@ builder.Services.AddAuthentication(options =>
         var clientSecret = keycloakSettings["ClientSecret"]!;
 
         options.Authority = $"{publicAddress}/realms/{realm}";
-        options.MetadataAddress = $"{internalAddress}/realms/{realm}/.well-known/openid-configuration";
+        options.MetadataAddress = $"{publicAddress}/realms/{realm}/.well-known/openid-configuration";
         options.ClientId = clientId;
         options.ClientSecret = clientSecret;
         options.ResponseType = "code";
@@ -46,7 +46,7 @@ builder.Services.AddAuthentication(options =>
         options.Scope.Add("offline_access");
 
         options.TokenValidationParameters.NameClaimType = "preferred_username";
-        options.TokenValidationParameters.ValidIssuer = $"{internalAddress}/realms/{realm}";
+        options.TokenValidationParameters.ValidIssuer = $"{publicAddress}/realms/{realm}";
 
         options.Events = new OpenIdConnectEvents
         {
