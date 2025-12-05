@@ -1,6 +1,7 @@
 using CloudScribe.Notes.API.Api.Endpoints;
+using CloudScribe.Notes.API.Configuration;
 using CloudScribe.Notes.API.ExceptionHandling;
-using CloudScribe.Notes.API.Extensions;
+using CloudScribe.Notes.API.HostedServices;
 using CloudScribe.Notes.API.Infrastructure.Auth;
 using CloudScribe.Notes.API.Infrastructure.Data;
 using CloudScribe.Notes.API.Services;
@@ -54,6 +55,11 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddValidatorsFromAssembly(typeof(Program).Assembly);
 
+builder.Services.Configure<MigrationJobSettings>(
+    builder.Configuration.GetSection("MigrationJob"));
+
+builder.Services.AddHostedService<DatabaseMigrationHostedService>();
+
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowAll",
@@ -69,7 +75,6 @@ app.UseExceptionHandler();
 
 if (app.Environment.IsDevelopment())
 {
-    app.ApplyMigrations();
     app.MapOpenApi();
 }
 
