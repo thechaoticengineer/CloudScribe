@@ -2,7 +2,7 @@
 
 NAMESPACE="cloudscribe"
 SECRET_NAME="cloudscribe-secrets"
-ENV_FILE="./infrastructure/k8s/.secrets.env"
+ENV_FILE=".secrets.env"
 
 if [ ! -f "$ENV_FILE" ]; then
     echo "ERROR: File $ENV_FILE not found."
