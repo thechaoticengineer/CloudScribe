@@ -1,10 +1,15 @@
 using CloudScribe.Blazor.Services.Auth;
 using CloudScribe.Contracts.Notes;
 using CloudScribe.SharedKernel;
+using Microsoft.Extensions.Logging;
 
 namespace CloudScribe.Blazor.Services;
 
-public class NotesClient(IHttpClientFactory factory, TokenService tokenService) : BaseClient(factory, tokenService, "API")
+public class NotesClient(
+    IHttpClientFactory factory,
+    TokenService tokenService,
+    ILogger<NotesClient> logger)
+    : BaseClient(factory, tokenService, logger, "API")
 {
     public async Task<PagedResult<NoteDto>?> GetNotesAsync(int pageNumber = 1, int pageSize = 10)
     {

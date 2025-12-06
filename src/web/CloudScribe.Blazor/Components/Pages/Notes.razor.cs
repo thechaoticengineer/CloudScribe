@@ -7,19 +7,29 @@ using MudBlazor;
 
 namespace CloudScribe.Blazor.Components.Pages;
 
-public partial class Notes(NotesClient notesClient, IDialogService dialogService, ISnackbar snackbar) : ComponentBase
+public partial class Notes(
+    NotesClient notesClient,
+    IDialogService dialogService,
+    ISnackbar snackbar,
+    ILogger<Notes> logger) : ComponentBase
 {
-    private NoteFormModel Request { get; set; } = new();
     private PagedResult<NoteDto>? _notes;
     
-
     protected override async Task OnInitializedAsync()
     {
         try
         {
             await LoadNotes();
         }
-        catch (Exception)
+        catch (HttpRequestException ex)
+        {
+            logger.LogError(ex, "Failed to load notes. Status: {StatusCode}", ex.StatusCode);
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Unexpected error while loading notes");
+        }
+        finally
         {
             snackbar.Add("Error loading notes", Severity.Error);
         }
@@ -39,7 +49,7 @@ public partial class Notes(NotesClient notesClient, IDialogService dialogService
         }
         else
         {
-            snackbar.Add("Error!", Severity.Error);
+            snackbar.Add("Error while deleting!", Severity.Error);
         }
     }
     
@@ -75,7 +85,7 @@ public partial class Notes(NotesClient notesClient, IDialogService dialogService
         {
             var data = (NoteFormModel)result.Data!;
 
-            try 
+            try
             {
                 if (noteToEdit != null)
                 {
@@ -89,11 +99,20 @@ public partial class Notes(NotesClient notesClient, IDialogService dialogService
                     await notesClient.CreateNoteAsync(createRequest);
                     snackbar.Add("Note created", Severity.Success);
                 }
+
                 await LoadNotes();
             }
-            catch (Exception)
+            catch (HttpRequestException ex)
             {
-                snackbar.Add("Occur error while saving", Severity.Error);
+                logger.LogError(ex, "Failed to save note. Status: {StatusCode}", ex.StatusCode);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Unexpected error while saving note");
+            }
+            finally
+            {
+                snackbar.Add("Error occurred while saving", Severity.Error);
             }
         }
     }
