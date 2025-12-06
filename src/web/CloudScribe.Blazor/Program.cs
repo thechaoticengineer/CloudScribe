@@ -8,7 +8,6 @@ using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
 builder.Services.AddRazorComponents()
     .AddInteractiveServerComponents();
 
@@ -39,6 +38,7 @@ builder.Services.AddAuthentication(options =>
         options.ResponseType = "code";
         options.RequireHttpsMetadata = false;
         options.SaveTokens = true;
+        options.SignedOutRedirectUri = "/";
 
         options.Scope.Add("openid");
         options.Scope.Add("profile");
@@ -61,13 +61,31 @@ builder.Services.AddAuthentication(options =>
             },
             OnRedirectToIdentityProvider = context =>
             {
-                // Replace internal Keycloak address with public address for browser redirects
                 var internalHost = new Uri(internalAddress).Authority;
                 var publicHost = new Uri(publicAddress).Authority;
 
                 context.ProtocolMessage.IssuerAddress = context.ProtocolMessage.IssuerAddress?
                     .Replace(internalHost, publicHost);
 
+                return Task.CompletedTask;
+            },
+            OnRedirectToIdentityProviderForSignOut = context =>
+            {
+                var internalHost = new Uri(internalAddress).Authority;
+                var publicHost = new Uri(publicAddress).Authority;
+
+                if (context.ProtocolMessage.IssuerAddress != null)
+                {
+                    context.ProtocolMessage.IssuerAddress = context.ProtocolMessage.IssuerAddress
+                        .Replace(internalHost, publicHost);
+                }
+
+                return Task.CompletedTask;
+            },
+            OnAuthenticationFailed = context =>
+            {
+                context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>()
+                    .LogError(context.Exception, "Authentication failed: {Message}", context.Exception.Message);
                 return Task.CompletedTask;
             }
         };

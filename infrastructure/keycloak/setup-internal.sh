@@ -21,6 +21,7 @@ if ! $KCADM get clients -r cloudscribe -q clientId=cloudscribe-web | grep "cloud
       -s enabled=true \
       -s clientAuthenticatorType=client-secret \
       -s "redirectUris=[\"https://localhost:7283/signin-oidc\"]" \
+      -s 'attributes={"post.logout.redirect.uris":"https://localhost:7283/*"}' \
       -s "webOrigins=[\"+\"]" \
       -s publicClient=false \
       -s serviceAccountsEnabled=true \
