@@ -24,18 +24,28 @@ data:
         $KCADM create realms -s realm=cloudscribe -s enabled=true -s accessTokenLifespan=3600
     fi
 
-    if ! $KCADM get clients -r cloudscribe -q clientId=cloudscribe-web | grep "cloudscribe-web" > /dev/null; then
+    # Get client ID if exists
+    CLIENT_ID=$($KCADM get clients -r cloudscribe -q clientId=cloudscribe-web --fields id --format csv --noquotes 2>/dev/null | tail -1)
+
+    if [ -z "$CLIENT_ID" ]; then
+        echo "Creating new client..."
         $KCADM create clients -r cloudscribe \
           -s clientId=cloudscribe-web \
           -s secret=$OIDC_CLIENT_SECRET \
           -s enabled=true \
           -s clientAuthenticatorType=client-secret \
-          -s "redirectUris=[\"https://localhost:7234/signin-oidc\", \"http://localhost:7234/signin-oidc\", \"http://localhost:5000/signin-oidc\"]" \
+          -s "redirectUris=[\"http://localhost:7234/signin-oidc\",\"https://localhost:7234/signin-oidc\",\"http://localhost:5000/signin-oidc\"]" \
+          -s 'attributes={"post.logout.redirect.uris":"http://localhost:7234/signout-callback-oidc##https://localhost:7234/signout-callback-oidc"}' \
           -s "webOrigins=[\"+\"]" \
           -s publicClient=false \
           -s serviceAccountsEnabled=true \
           -s standardFlowEnabled=true \
           -s directAccessGrantsEnabled=true
+    else
+        echo "Updating existing client $CLIENT_ID..."
+        $KCADM update clients/$CLIENT_ID -r cloudscribe \
+          -s "redirectUris=[\"http://localhost:7234/signin-oidc\",\"https://localhost:7234/signin-oidc\",\"http://localhost:5000/signin-oidc\"]" \
+          -s 'attributes={"post.logout.redirect.uris":"http://localhost:7234/signout-callback-oidc##https://localhost:7234/signout-callback-oidc"}'
     fi
 
     # 3. User
@@ -45,7 +55,7 @@ data:
     fi
 
     echo "🎉 K8S CONFIGURATION FINISHED"
-
+    
 ---
 apiVersion: batch/v1
 kind: Job
