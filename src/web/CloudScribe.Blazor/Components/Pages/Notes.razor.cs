@@ -15,6 +15,7 @@ public partial class Notes(
 {
     private PagedResult<NoteDto>? _notes;
     
+
     protected override async Task OnInitializedAsync()
     {
         try
@@ -24,13 +25,11 @@ public partial class Notes(
         catch (HttpRequestException ex)
         {
             logger.LogError(ex, "Failed to load notes. Status: {StatusCode}", ex.StatusCode);
+            snackbar.Add("Error loading notes", Severity.Error);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Unexpected error while loading notes");
-        }
-        finally
-        {
             snackbar.Add("Error loading notes", Severity.Error);
         }
     }
@@ -99,19 +98,16 @@ public partial class Notes(
                     await notesClient.CreateNoteAsync(createRequest);
                     snackbar.Add("Note created", Severity.Success);
                 }
-
                 await LoadNotes();
             }
             catch (HttpRequestException ex)
             {
                 logger.LogError(ex, "Failed to save note. Status: {StatusCode}", ex.StatusCode);
+                snackbar.Add("Error occurred while saving", Severity.Error);
             }
             catch (Exception ex)
             {
                 logger.LogError(ex, "Unexpected error while saving note");
-            }
-            finally
-            {
                 snackbar.Add("Error occurred while saving", Severity.Error);
             }
         }
