@@ -21,7 +21,6 @@ public abstract class BaseClient(IHttpClientFactory factory, TokenService tokenS
         return client;
     }
     
-    // todo: add response pattern 
     protected async Task<T?> Get<T>(string uri)
     {
         var client = await CreateClientAsync();
