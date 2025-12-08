@@ -1,0 +1,61 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudscribe-blazor
+  namespace: cloudscribe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudscribe-blazor
+  template:
+    metadata:
+      labels:
+        app: cloudscribe-blazor
+    spec:
+      containers:
+        - name: blazor
+          image: acrcloudscribe081125.azurecr.io/cloudscribe-blazor:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Development"
+            - name: ApiUrl
+              value: "http://cloudscribe-api-service"
+            - name: Keycloak__PublicAddress
+              value: "http://132.220.15.39:8080"
+            - name: Keycloak__InternalAddress
+              value: "http://keycloak-service:8080"
+            - name: Keycloak__Realm
+              value: "cloudscribe"
+            - name: Keycloak__ClientId
+              value: "cloudscribe-web"
+            - name: Keycloak__ClientSecret
+              valueFrom:
+                secretKeyRef:
+                  name: cloudscribe-secrets
+                  key: oidc-client-secret
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: cloudscribe-secrets
+                  key: postgres-password
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudscribe-blazor-service
+  namespace: cloudscribe
+  annotations:
+    service.beta.kubernetes.io/azure-load-balancer-resource-group: "MC_rg-cloudscribe_aks-cloudscribe_westeurope"
+spec:
+  ports:
+    - port: 80
+      targetPort: 8080
+  selector:
+    app: cloudscribe-blazor
+  type: LoadBalancer
+  loadBalancerIP: "132.220.15.39"

@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloudscribe-api
+  namespace: cloudscribe
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: cloudscribe-api
+  template:
+    metadata:
+      labels:
+        app: cloudscribe-api
+    spec:
+      containers:
+        - name: api
+          image: acrcloudscribe081125.azurecr.io/cloudscribe-api:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+          env:
+            - name: ASPNETCORE_ENVIRONMENT
+              value: "Development"
+            - name: ConnectionStrings__DefaultConnection
+              valueFrom:
+                secretKeyRef:
+                  name: cloudscribe-secrets
+                  key: postgres-connection-string
+
+            - name: Keycloak__PublicAddress
+              value: "http://localhost:8080"
+            - name: Keycloak__InternalAddress
+              value: "http://keycloak-service:8080"
+            - name: Keycloak__Realm
+              value: "cloudscribe"
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: cloudscribe-api-service 
+  namespace: cloudscribe
+spec:
+  ports:
+    - port: 80       
+      targetPort: 8080 
+  selector:
+    app: cloudscribe-api
+  type: ClusterIP
