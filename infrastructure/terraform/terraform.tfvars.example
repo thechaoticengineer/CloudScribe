@@ -4,7 +4,7 @@ resource_group_name = "rg-cloudscribe"
 location            = "westeurope"
 aks_cluster_name    = "aks-cloudscribe"
 aks_dns_prefix      = "cloudscribe"
-kubernetes_version  = "1.29"
+kubernetes_version  = "1.33"
 
 # Node pool configuration
 node_count     = 2
