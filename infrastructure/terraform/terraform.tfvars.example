@@ -1,0 +1,31 @@
+# Copy this file to terraform.tfvars and adjust values as needed
+
+resource_group_name = "rg-cloudscribe"
+location            = "westeurope"
+aks_cluster_name    = "aks-cloudscribe"
+aks_dns_prefix      = "cloudscribe"
+kubernetes_version  = "1.29"
+
+# Node pool configuration
+node_count     = 2
+vm_size        = "Standard_D2s_v3"
+os_disk_size_gb = 30
+
+# Autoscaling (set enable_auto_scaling to true to enable)
+enable_auto_scaling = false
+min_node_count      = 1
+max_node_count      = 5
+
+# Azure Container Registry (must be globally unique, alphanumeric only)
+acr_name = "acrcloudscribe"
+acr_sku  = "Basic"
+
+# Network
+create_public_ip = true
+
+# Tags
+tags = {
+  Environment = "Development"
+  Project     = "CloudScribe"
+  ManagedBy   = "Terraform"
+}

@@ -129,11 +129,11 @@ CloudScribe/
 - [x] Keycloak integration (OAuth2/OIDC)
 - [x] Entity Framework Core with PostgreSQL
 - [x] Docker containerization
-- [ ] Kubernetes manifests
-- [ ] Terraform infrastructure provisioning
+- [x] Kubernetes manifests
+- [x] Terraform infrastructure provisioning
+- [x] CI/CD pipeline
 - [ ] Azure Bicep alternative
-- [ ] AKS deployment
-- [ ] CI/CD pipeline
+- [ ] AKS deployment (infrastructure ready, deployment guide available)
 - [ ] Entra ID integration option
 
 ## License
