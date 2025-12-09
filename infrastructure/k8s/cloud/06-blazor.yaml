@@ -22,10 +22,22 @@ spec:
           env:
             - name: ASPNETCORE_ENVIRONMENT
               value: "Development"
+            - name: ASPNETCORE_URLS
+              value: "http://+:8080"
+            - name: ASPNETCORE_FORWARDEDHEADERS_ENABLED
+              value: "true"
+            - name: PublicUrl
+              valueFrom:
+                secretKeyRef:
+                  name: cloudscribe-secrets
+                  key: BLAZOR_PUBLIC_URL
             - name: ApiUrl
               value: "http://cloudscribe-api-service"
             - name: Keycloak__PublicAddress
-              value: "http://132.220.15.39:8080"
+              valueFrom:
+                secretKeyRef:
+                  name: cloudscribe-secrets
+                  key: KEYCLOAK_PUBLIC_URL
             - name: Keycloak__InternalAddress
               value: "http://keycloak-service:8080"
             - name: Keycloak__Realm
@@ -58,4 +70,4 @@ spec:
   selector:
     app: cloudscribe-blazor
   type: LoadBalancer
-  loadBalancerIP: "132.220.15.39"
+  loadBalancerIP: "20.61.61.156"

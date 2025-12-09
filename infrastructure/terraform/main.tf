@@ -75,14 +75,30 @@ resource "azurerm_role_assignment" "aks_acr_pull" {
   skip_service_principal_aad_check = true
 }
 
-# Public IP for LoadBalancer (optional - for Blazor service)
-resource "azurerm_public_ip" "cloudscribe" {
+# Public IP for Keycloak LoadBalancer
+resource "azurerm_public_ip" "keycloak" {
   count               = var.create_public_ip ? 1 : 0
-  name                = "${var.aks_cluster_name}-public-ip"
+  name                = "${var.aks_cluster_name}-keycloak-ip"
   location            = azurerm_resource_group.cloudscribe.location
   resource_group_name = azurerm_kubernetes_cluster.cloudscribe.node_resource_group
   allocation_method   = "Static"
   sku                 = "Standard"
 
-  tags = var.tags
+  tags = merge(var.tags, {
+    Service = "Keycloak"
+  })
+}
+
+# Public IP for Blazor LoadBalancer
+resource "azurerm_public_ip" "blazor" {
+  count               = var.create_public_ip ? 1 : 0
+  name                = "${var.aks_cluster_name}-blazor-ip"
+  location            = azurerm_resource_group.cloudscribe.location
+  resource_group_name = azurerm_kubernetes_cluster.cloudscribe.node_resource_group
+  allocation_method   = "Static"
+  sku                 = "Standard"
+
+  tags = merge(var.tags, {
+    Service = "Blazor"
+  })
 }

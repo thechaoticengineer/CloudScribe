@@ -51,9 +51,14 @@ output "acr_admin_password" {
   sensitive   = true
 }
 
-output "public_ip_address" {
-  description = "The static public IP address (if created)"
-  value       = var.create_public_ip ? azurerm_public_ip.cloudscribe[0].ip_address : null
+output "keycloak_public_ip" {
+  description = "The static public IP address for Keycloak"
+  value       = var.create_public_ip ? azurerm_public_ip.keycloak[0].ip_address : null
+}
+
+output "blazor_public_ip" {
+  description = "The static public IP address for Blazor"
+  value       = var.create_public_ip ? azurerm_public_ip.blazor[0].ip_address : null
 }
 
 output "kube_config_command" {

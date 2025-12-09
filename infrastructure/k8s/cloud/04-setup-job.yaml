@@ -34,8 +34,8 @@ data:
           -s secret=$OIDC_CLIENT_SECRET \
           -s enabled=true \
           -s clientAuthenticatorType=client-secret \
-          -s "redirectUris=[\"http://localhost:7234/signin-oidc\",\"https://localhost:7234/signin-oidc\",\"http://localhost:5000/signin-oidc\",\"http://132.220.15.39/signin-oidc\",\"http://132.220.15.39:8080/signin-oidc\"]" \
-          -s 'attributes={"post.logout.redirect.uris":"http://localhost:7234/signout-callback-oidc##https://localhost:7234/signout-callback-oidc##http://132.220.15.39/signout-callback-oidc##http://132.220.15.39:8080/signout-callback-oidc"}' \
+          -s "redirectUris=[\"${BLAZOR_PUBLIC_URL}/signin-oidc\"]" \
+          -s "attributes={\"post.logout.redirect.uris\":\"${BLAZOR_PUBLIC_URL}/signout-callback-oidc\"}" \
           -s "webOrigins=[\"+\"]" \
           -s publicClient=false \
           -s serviceAccountsEnabled=true \
@@ -44,8 +44,8 @@ data:
     else
         echo "Updating existing client $CLIENT_ID..."
         $KCADM update clients/$CLIENT_ID -r cloudscribe \
-          -s "redirectUris=[\"http://localhost:7234/signin-oidc\",\"https://localhost:7234/signin-oidc\",\"http://localhost:5000/signin-oidc\",\"http://132.220.15.39/signin-oidc\",\"http://132.220.15.39:8080/signin-oidc\"]" \
-          -s 'attributes={"post.logout.redirect.uris":"http://localhost:7234/signout-callback-oidc##https://localhost:7234/signout-callback-oidc##http://132.220.15.39/signout-callback-oidc##http://132.220.15.39:8080/signout-callback-oidc"}'
+          -s "redirectUris=[\"${BLAZOR_PUBLIC_URL}/signin-oidc\"]" \
+          -s "attributes={\"post.logout.redirect.uris\":\"${BLAZOR_PUBLIC_URL}/signout-callback-oidc\"}"
     fi
 
     # 3. User
@@ -85,6 +85,11 @@ spec:
                 secretKeyRef:
                   name: cloudscribe-secrets
                   key: oidc-client-secret
+            - name: BLAZOR_PUBLIC_URL
+              valueFrom:
+                secretKeyRef:
+                  name: cloudscribe-secrets
+                  key: BLAZOR_PUBLIC_URL
           volumeMounts:
             - name: script-volume
               mountPath: /opt/scripts

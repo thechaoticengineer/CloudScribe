@@ -4,6 +4,8 @@ using CloudScribe.Blazor.Services;
 using CloudScribe.Blazor.Services.Auth;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.EntityFrameworkCore;
 using MudBlazor.Services;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -15,15 +17,34 @@ builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddMudServices();
 
+// Configure PostgreSQL connection for Data Protection Keys
+var pgPassword = builder.Configuration["POSTGRES_PASSWORD"] ??
+                 throw new InvalidOperationException("PostgreSQL password not configured");
+var pgConnectionString = $"Host=postgres-service;Port=5432;Database=cloudscribe;Username=postgres;Password={pgPassword}";
+
+builder.Services.AddDbContext<DataProtectionKeyDbContext>(options =>
+{
+    options.UseNpgsql(pgConnectionString);
+    options.UseSnakeCaseNamingConvention();
+});
+
+builder.Services.AddDataProtection()
+    .PersistKeysToDbContext<DataProtectionKeyDbContext>();
+
 builder.Services.AddAuthentication(options =>
     {
         options.DefaultScheme = CookieAuthenticationDefaults.AuthenticationScheme;
         options.DefaultChallengeScheme = OpenIdConnectDefaults.AuthenticationScheme;
     })
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+    {
+        options.Cookie.SameSite = SameSiteMode.Lax;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Allow HTTP cookies
+    })
     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {
         var keycloakSettings = builder.Configuration.GetSection("Keycloak");
+        var publicUrl = builder.Configuration["PublicUrl"];
 
         var publicAddress = keycloakSettings["PublicAddress"]!;
         var internalAddress = keycloakSettings["InternalAddress"]!;
@@ -39,6 +60,12 @@ builder.Services.AddAuthentication(options =>
         options.RequireHttpsMetadata = false;
         options.SaveTokens = true;
         options.SignedOutRedirectUri = "/";
+
+        // Disable PAR (Pushed Authorization Request) - not needed for HTTP
+        options.PushedAuthorizationBehavior = Microsoft.AspNetCore.Authentication.OpenIdConnect.PushedAuthorizationBehavior.Disable;
+
+        // Set explicit callback path for redirect
+        options.CallbackPath = "/signin-oidc";
 
         options.Scope.Add("openid");
         options.Scope.Add("profile");
@@ -61,11 +88,23 @@ builder.Services.AddAuthentication(options =>
             },
             OnRedirectToIdentityProvider = context =>
             {
+                // Override redirect_uri to use public URL when configured
+                if (!string.IsNullOrEmpty(publicUrl))
+                {
+                    context.ProtocolMessage.RedirectUri = $"{publicUrl}/signin-oidc";
+                }
+
+                // Replace internal host with public host in IssuerAddress
                 var internalHost = new Uri(internalAddress).Authority;
                 var publicHost = new Uri(publicAddress).Authority;
 
                 context.ProtocolMessage.IssuerAddress = context.ProtocolMessage.IssuerAddress?
                     .Replace(internalHost, publicHost);
+
+                if (context.Options.Configuration is not null)
+                {
+                    context.Options.Configuration.PushedAuthorizationRequestEndpoint = null;
+                }
 
                 return Task.CompletedTask;
             },
@@ -101,6 +140,13 @@ builder.Services.AddHttpClient("API", client =>
 
 builder.Services.AddAuthorization();
 builder.Services.AddCascadingAuthenticationState();
+
+// Create the DB table for Data Protection keys if it doesn't exist.
+// This must be done before builder.Build() to avoid a race condition.
+var tempServices = builder.Services.BuildServiceProvider();
+var dbContext = tempServices.GetRequiredService<DataProtectionKeyDbContext>();
+dbContext.Database.EnsureCreated();
+
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
@@ -108,10 +154,11 @@ if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Error", createScopeForErrors: true);
     // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
-    app.UseHsts();
+    //app.UseHsts();
 }
 
-app.UseHttpsRedirection();
+// Disable HTTPS redirection for cloud deployment
+//app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
