@@ -29,7 +29,10 @@ spec:
                   key: postgres-connection-string
 
             - name: Keycloak__PublicAddress
-              value: "http://localhost:8080"
+              valueFrom:
+                secretKeyRef:
+                  name: cloudscribe-secrets
+                  key: KEYCLOAK_PUBLIC_URL
             - name: Keycloak__InternalAddress
               value: "http://keycloak-service:8080"
             - name: Keycloak__Realm

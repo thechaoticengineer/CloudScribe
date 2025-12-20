@@ -73,6 +73,8 @@ var app = builder.Build();
 
 app.UseExceptionHandler();
 
+app.UseCors("AllowAll");
+
 if (app.Environment.IsDevelopment())
 {
     app.MapOpenApi();
@@ -82,5 +84,8 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapNotesEndpoints();
-app.UseHttpsRedirection();
+
+// Disable HTTPS redirection - handled by nginx Ingress
+//app.UseHttpsRedirection();
+
 app.Run();

@@ -38,8 +38,8 @@ builder.Services.AddAuthentication(options =>
     })
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
     {
-        options.Cookie.SameSite = SameSiteMode.Lax;
-        options.Cookie.SecurePolicy = CookieSecurePolicy.None; // Allow HTTP cookies
+        options.Cookie.SameSite = SameSiteMode.None;
+        options.Cookie.SecurePolicy = CookieSecurePolicy.Always;
     })
     .AddOpenIdConnect(OpenIdConnectDefaults.AuthenticationScheme, options =>
     {

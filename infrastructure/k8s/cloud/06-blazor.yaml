@@ -61,13 +61,10 @@ kind: Service
 metadata:
   name: cloudscribe-blazor-service
   namespace: cloudscribe
-  annotations:
-    service.beta.kubernetes.io/azure-load-balancer-resource-group: "MC_rg-cloudscribe_aks-cloudscribe_westeurope"
 spec:
   ports:
     - port: 80
       targetPort: 8080
   selector:
     app: cloudscribe-blazor
-  type: LoadBalancer
-  loadBalancerIP: "20.61.61.156"
+  type: ClusterIP
